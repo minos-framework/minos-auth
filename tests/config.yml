@@ -1,0 +1,14 @@
+rest:
+    host: localhost
+    port: 55909
+user-service:
+    host: localhost
+    port: 5567
+credential-service:
+    host: localhost
+    port: 5568
+    path: /credentials
+token-service:
+    host: localhost
+    port: 5569
+    path: /token
