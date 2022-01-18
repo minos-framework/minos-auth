@@ -1,6 +1,12 @@
 rest:
     host: localhost
     port: 55909
+database:
+    dbname: auth_db
+    user: minos
+    password: min0s
+    host: localhost
+    port: 5432
 user-service:
     host: localhost
     port: 5567

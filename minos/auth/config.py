@@ -20,6 +20,7 @@ from .exceptions import (
 )
 
 REST = collections.namedtuple("Rest", "host port")
+DATABASE = collections.namedtuple("Database", "dbname user password host port")
 USER_SERVICE = collections.namedtuple("UserService", "host port")
 CREDENTIAL_SERVICE = collections.namedtuple("CredentialService", "host port path")
 TOKEN_SERVICE = collections.namedtuple("TokenService", "host port path")
@@ -27,6 +28,11 @@ TOKEN_SERVICE = collections.namedtuple("TokenService", "host port path")
 _ENVIRONMENT_MAPPER = {
     "rest.host": "AUTH_REST_HOST",
     "rest.port": "AUTH_REST_PORT",
+    "database.dbname": "AUTH_DATABASE_NAME",
+    "database.user": "AUTH_DATABASE_USER",
+    "database.password": "AUTH_DATABASE_PASSWORD",
+    "database.host": "AUTH_DATABASE_HOST",
+    "database.port": "AUTH_DATABASE_PORT",
     "user-service.host": "AUTH_USER_SERVICE_REST_HOST",
     "user-service.port": "AUTH_USER_SERVICE_REST_PORT",
     "credential-service.host": "AUTH_CREDENTIAL_SERVICE_REST_HOST",
@@ -40,6 +46,11 @@ _ENVIRONMENT_MAPPER = {
 _PARAMETERIZED_MAPPER = {
     "rest.host": "auth_rest_host",
     "rest.port": "auth_rest_port",
+    "database.database": "auth_database_name",
+    "database.user": "auth_database_user",
+    "database.password": "auth_database_password",
+    "database.host": "auth_database_host",
+    "database.port": "auth_database_port",
     "user-service.host": "auth_user_service_rest_host",
     "user-service.port": "auth_user_service_rest_port",
     "credential-service.host": "auth_credential_service_rest_host",
@@ -105,6 +116,20 @@ class AuthConfig(abc.ABC):
         :return: A ``REST`` NamedTuple instance.
         """
         return REST(host=self._get("rest.host"), port=int(self._get("rest.port")))
+
+    @property
+    def database(self) -> DATABASE:
+        """Get the rest config.
+
+        :return: A ``REST`` NamedTuple instance.
+        """
+        return DATABASE(
+            dbname=self._get("database.dbname"),
+            user=self._get("database.user"),
+            password=self._get("database.password"),
+            host=self._get("database.host"),
+            port=int(self._get("database.port")),
+        )
 
     @property
     def user_service(self) -> USER_SERVICE:

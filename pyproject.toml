@@ -36,6 +36,9 @@ cached-property = "^1.5.2"
 aiohttp-middlewares = "^1.1.0"
 aiomisc = "^15.2.16"
 PyYAML = "^6.0"
+SQLAlchemy = "1.4.22"
+psycopg2 = "^2.9.3"
+uuid = "^1.30"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b"

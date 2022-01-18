@@ -45,6 +45,41 @@ class TestApiGatewayConfig(unittest.TestCase):
         config = AuthConfig(path=self.config_file_path)
         self.assertEqual(4040, config.rest.port)
 
+    def test_config_database(self):
+        config = AuthConfig(path=self.config_file_path)
+        database = config.database
+
+        self.assertEqual("auth_db", database.dbname)
+        self.assertEqual("minos", database.user)
+        self.assertEqual("min0s", database.password)
+        self.assertEqual("localhost", database.host)
+        self.assertEqual(5432, database.port)
+
+    @mock.patch.dict(os.environ, {"AUTH_DATABASE_NAME": "db_test_name"})
+    def test_overwrite_with_environment_database_name(self):
+        config = AuthConfig(path=self.config_file_path)
+        self.assertEqual("db_test_name", config.database.dbname)
+
+    @mock.patch.dict(os.environ, {"AUTH_DATABASE_USER": "test_user"})
+    def test_overwrite_with_environment_database_user(self):
+        config = AuthConfig(path=self.config_file_path)
+        self.assertEqual("test_user", config.database.user)
+
+    @mock.patch.dict(os.environ, {"AUTH_DATABASE_PASSWORD": "some_pass"})
+    def test_overwrite_with_environment_database_password(self):
+        config = AuthConfig(path=self.config_file_path)
+        self.assertEqual("some_pass", config.database.password)
+
+    @mock.patch.dict(os.environ, {"AUTH_DATABASE_HOST": "localhost.com"})
+    def test_overwrite_with_environment_database_host(self):
+        config = AuthConfig(path=self.config_file_path)
+        self.assertEqual("localhost.com", config.database.host)
+
+    @mock.patch.dict(os.environ, {"AUTH_DATABASE_PORT": "2020"})
+    def test_overwrite_with_environment_database_port(self):
+        config = AuthConfig(path=self.config_file_path)
+        self.assertEqual(2020, config.database.port)
+
     def test_config_user_service(self):
         config = AuthConfig(path=self.config_file_path)
         user_service = config.user_service
