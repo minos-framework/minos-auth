@@ -28,7 +28,7 @@ class AuthRestService(AIOHTTPService):
 
         app["config"] = self.config
 
-        app.router.add_route("*", "/auth/credentials", credentials)
-        app.router.add_route("*", "/auth/token", token)
+        app.router.add_route("*", "/auth/{credentials:.*}", credentials)
+        app.router.add_route("*", "/auth/{token:.*}", token)
 
         return app

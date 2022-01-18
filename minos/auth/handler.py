@@ -27,9 +27,21 @@ async def credentials(request: web.Request) -> web.Response:
     credential_port = request.app["config"].credential_service.port
     credential_path = request.app["config"].credential_service.path
 
-    verb = request.method
+    credential_url = URL(
+        f"http://{credential_host}:{credential_port}{credential_path}{request.path.replace('/auth/credentials', '')}"
+    )
 
-    return web.json_response({})
+    headers = request.headers.copy()
+    data = await request.read()
+
+    try:
+        async with ClientSession() as session:
+            async with session.request(
+                headers=headers, method=request.method, url=credential_url, data=data
+            ) as response:
+                return await _clone_response(response)
+    except ClientConnectorError:
+        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
 
 
 async def token(request: web.Request) -> web.Response:
@@ -41,3 +53,10 @@ async def token(request: web.Request) -> web.Response:
     verb = request.method
 
     return web.json_response({})
+
+
+# noinspection PyMethodMayBeStatic
+async def _clone_response(response: ClientResponse) -> web.Response:
+    return web.Response(
+        body=await response.read(), status=response.status, reason=response.reason, headers=response.headers,
+    )

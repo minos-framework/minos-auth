@@ -120,9 +120,11 @@ class AuthConfig(abc.ABC):
 
         :return: A ``REST`` NamedTuple instance.
         """
-        return CREDENTIAL_SERVICE(host=self._get("credential-service.host"),
-                                  port=int(self._get("credential-service.port")),
-                                  path=str(self._get("credential-service.path")))
+        return CREDENTIAL_SERVICE(
+            host=self._get("credential-service.host"),
+            port=int(self._get("credential-service.port")),
+            path=str(self._get("credential-service.path")),
+        )
 
     @property
     def token_service(self) -> TOKEN_SERVICE:
@@ -130,5 +132,8 @@ class AuthConfig(abc.ABC):
 
         :return: A ``REST`` NamedTuple instance.
         """
-        return TOKEN_SERVICE(host=self._get("token-service.host"), port=int(self._get("token-service.port")),
-                             path=str(self._get("token-service.path")))
+        return TOKEN_SERVICE(
+            host=self._get("token-service.host"),
+            port=int(self._get("token-service.port")),
+            path=str(self._get("token-service.path")),
+        )
