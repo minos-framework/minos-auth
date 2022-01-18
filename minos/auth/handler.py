@@ -71,9 +71,29 @@ async def token(request: web.Request) -> web.Response:
     token_port = request.app["config"].token_service.port
     token_path = request.app["config"].token_service.path
 
-    verb = request.method
+    credential_url = URL(
+        f"http://{token_host}:{token_port}{token_path}{request.path.replace('/auth/token', '')}"
+    )
 
-    return web.json_response({})
+    headers = request.headers.copy()
+    data = await request.read()
+
+    try:
+        async with ClientSession() as session:
+            async with session.request(
+                headers=headers, method=request.method, url=credential_url, data=data
+            ) as response:
+                resp = await _clone_response(response)
+
+                if response.status == 200 and request.method == 'POST' and request.path == '/auth/token':
+                    resp_json = json.loads(resp.text)
+                    credential_uuid = resp_json["token"]
+                    auth_uuid = await create_authentication(request, credential_uuid, AuthType.TOKEN.value)
+                    return web.json_response({"authentication": str(auth_uuid), "token": resp_json["token"]})
+
+                return resp
+    except ClientConnectorError:
+        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
 
 
 # noinspection PyMethodMayBeStatic

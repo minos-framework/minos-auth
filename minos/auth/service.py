@@ -38,8 +38,8 @@ class AuthRestService(AIOHTTPService):
 
         app["db_engine"] = self.engine
 
-        app.router.add_route("*", "/auth/{credentials:.*}", credentials)
-        app.router.add_route("*", "/auth/{token:.*}", token)
+        app.router.add_route("*", "/auth/credentials/{name:.*}", credentials)
+        app.router.add_route("*", "/auth/token{name:.*}", token)
 
         return app
 
