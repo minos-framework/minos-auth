@@ -16,8 +16,11 @@ from .config import (
     AuthConfig,
 )
 from .handler import (
+    register,
     credentials,
     token,
+    login,
+    get_user_by_token,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,6 +41,9 @@ class AuthRestService(AIOHTTPService):
 
         app["db_engine"] = self.engine
 
+        app.router.add_route("*", "/auth/register", register)
+        app.router.add_route("*", "/auth/login", login)
+        app.router.add_route("GET", "/auth/user", get_user_by_token)
         app.router.add_route("*", "/auth/credentials/{name:.*}", credentials)
         app.router.add_route("*", "/auth/token{name:.*}", token)
 

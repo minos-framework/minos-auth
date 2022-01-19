@@ -21,9 +21,9 @@ from .exceptions import (
 
 REST = collections.namedtuple("Rest", "host port")
 DATABASE = collections.namedtuple("Database", "dbname user password host port")
-USER_SERVICE = collections.namedtuple("UserService", "host port")
-CREDENTIAL_SERVICE = collections.namedtuple("CredentialService", "host port path")
-TOKEN_SERVICE = collections.namedtuple("TokenService", "host port path")
+USER_SERVICE = collections.namedtuple("UserService", "host port path")
+CREDENTIAL_SERVICE = collections.namedtuple("CredentialService", "host port path create_token")
+TOKEN_SERVICE = collections.namedtuple("TokenService", "host port path create_token")
 
 _ENVIRONMENT_MAPPER = {
     "rest.host": "AUTH_REST_HOST",
@@ -137,7 +137,8 @@ class AuthConfig(abc.ABC):
 
         :return: A ``REST`` NamedTuple instance.
         """
-        return USER_SERVICE(host=self._get("user-service.host"), port=int(self._get("user-service.port")))
+        return USER_SERVICE(host=self._get("user-service.host"), port=int(self._get("user-service.port")),
+                            path=self._get("user-service.path"))
 
     @property
     def credential_service(self) -> CREDENTIAL_SERVICE:
@@ -149,6 +150,7 @@ class AuthConfig(abc.ABC):
             host=self._get("credential-service.host"),
             port=int(self._get("credential-service.port")),
             path=str(self._get("credential-service.path")),
+            create_token=self._get("credential-service.create-token")
         )
 
     @property
@@ -161,4 +163,5 @@ class AuthConfig(abc.ABC):
             host=self._get("token-service.host"),
             port=int(self._get("token-service.port")),
             path=str(self._get("token-service.path")),
+            create_token=self._get("token-service.create-token")
         )

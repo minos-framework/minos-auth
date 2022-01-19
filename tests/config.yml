@@ -9,12 +9,15 @@ database:
     port: 5432
 user-service:
     host: localhost
-    port: 5567
+    port: 8090
+    path: /users
 credential-service:
     host: localhost
     port: 5568
     path: /credentials
+    create-token: true
 token-service:
     host: localhost
     port: 5569
     path: /token
+    create-token: false
