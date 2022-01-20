@@ -45,6 +45,14 @@ class TestApiGatewayConfig(unittest.TestCase):
         config = AuthConfig(path=self.config_file_path)
         self.assertEqual(4040, config.rest.port)
 
+    def test_overwrite_with_parameter_rest_host(self):
+        config = AuthConfig(path=self.config_file_path, auth_rest_host="::1")
+        self.assertEqual("::1", config.rest.host)
+
+    def test_overwrite_with_parameter_rest_port(self):
+        config = AuthConfig(path=self.config_file_path, auth_rest_port=2233)
+        self.assertEqual(2233, config.rest.port)
+
     def test_config_database(self):
         config = AuthConfig(path=self.config_file_path)
         database = config.database
@@ -85,7 +93,7 @@ class TestApiGatewayConfig(unittest.TestCase):
         user_service = config.user_service
 
         self.assertEqual("localhost", user_service.host)
-        self.assertEqual(5567, user_service.port)
+        self.assertEqual(8090, user_service.port)
 
     @mock.patch.dict(os.environ, {"AUTH_USER_SERVICE_REST_HOST": "::1"})
     def test_overwrite_with_environment_user_service_host(self):
