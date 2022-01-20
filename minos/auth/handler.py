@@ -1,29 +1,33 @@
+import json
 import logging
+import secrets
 from datetime import (
     datetime,
 )
-from uuid import uuid4
-import json
+from uuid import (
+    uuid4,
+)
+
 from aiohttp import (
     ClientConnectorError,
     ClientResponse,
     ClientSession,
     web,
 )
-from yarl import (
-    URL,
-)
-from .database.models import (
-    Authentication,
-    AuthType,
+from sqlalchemy import (
+    exc,
 )
 from sqlalchemy.orm import (
     sessionmaker,
 )
-from sqlalchemy import (
-    exc,
+from yarl import (
+    URL,
 )
-import secrets
+
+from .database.models import (
+    Authentication,
+    AuthType,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -42,18 +46,14 @@ async def register(request: web.Request) -> web.Response:
     user_port = request.app["config"].user_service.port
     user_path = request.app["config"].user_service.path
 
-    user_url = URL(
-        f"http://{user_host}:{user_port}{user_path}"
-    )
+    user_url = URL(f"http://{user_host}:{user_port}{user_path}")
 
     headers = request.headers.copy()
     data = await request.read()
 
     try:
         async with ClientSession() as session:
-            async with session.request(
-                headers=headers, method="POST", url=user_url, data=data
-            ) as response:
+            async with session.request(headers=headers, method="POST", url=user_url, data=data) as response:
                 resp = await _clone_response(response)
 
                 if response.status == 200:
@@ -79,9 +79,7 @@ async def validate_credentials(request: web.Request):
     credential_port = request.app["config"].credential_service.port
     credential_path = request.app["config"].credential_service.path
 
-    credential_url = URL(
-        f"http://{credential_host}:{credential_port}{credential_path}/validate"
-    )
+    credential_url = URL(f"http://{credential_host}:{credential_port}{credential_path}/validate")
 
     headers = request.headers.copy()
     data = await request.read()
@@ -102,6 +100,11 @@ async def validate_credentials(request: web.Request):
                 return resp
     except ClientConnectorError:
         raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
+
+
+async def validate_token(request: web.Request) -> web.Response:
+    """ Get User by Session token """
+    return await get_user_by_token(request)
 
 
 async def get_credential_token(request: web.Request, credential_uuid: str):
@@ -144,18 +147,14 @@ async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:
     user_port = request.app["config"].user_service.port
     user_path = request.app["config"].user_service.path
 
-    credential_url = URL(
-        f"http://{user_host}:{user_port}{user_path}/{user_uuid}"
-    )
+    credential_url = URL(f"http://{user_host}:{user_port}{user_path}/{user_uuid}")
 
     headers = request.headers.copy()
     data = await request.read()
 
     try:
         async with ClientSession() as session:
-            async with session.request(
-                headers=headers, method="GET", url=credential_url, data=data
-            ) as response:
+            async with session.request(headers=headers, method="GET", url=credential_url, data=data) as response:
                 resp = await _clone_response(response)
                 return resp
     except ClientConnectorError:
@@ -182,7 +181,7 @@ async def credentials(request: web.Request) -> web.Response:
             ) as response:
                 resp = await _clone_response(response)
 
-                if response.status == 200 and request.method == 'POST' and request.path == '/auth/credentials':
+                if response.status == 200 and request.method == "POST" and request.path == "/auth/credentials":
                     resp_json = json.loads(resp.text)
                     credential_uuid = resp_json["credential"]
                     auth_uuid = await create_authentication(request, "", "", credential_uuid, AuthType.CREDENTIAL.value)
@@ -193,26 +192,26 @@ async def credentials(request: web.Request) -> web.Response:
         raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
 
 
-async def create_credentials_call(user_id: str, token: str, user_uuid: str, request: web.Request, data: dict, method: str = "POST"):
+async def create_credentials_call(
+    user_id: str, token: str, user_uuid: str, request: web.Request, data: dict, method: str = "POST"
+):
     credential_host = request.app["config"].credential_service.host
     credential_port = request.app["config"].credential_service.port
     credential_path = request.app["config"].credential_service.path
 
-    credential_url = URL(
-        f"http://{credential_host}:{credential_port}{credential_path}"
-    )
+    credential_url = URL(f"http://{credential_host}:{credential_port}{credential_path}")
 
     try:
         async with ClientSession() as session:
-            async with session.request(
-                method=method, url=credential_url, data=json.dumps(data)
-            ) as response:
+            async with session.request(method=method, url=credential_url, data=json.dumps(data)) as response:
                 resp = await _clone_response(response)
 
                 if response.status == 200:
                     resp_json = json.loads(resp.text)
                     credential_uuid = resp_json["credential"]
-                    auth_uuid = await create_authentication(request, token, user_id, user_uuid, credential_uuid, AuthType.CREDENTIAL.value)
+                    auth_uuid = await create_authentication(
+                        request, token, user_id, user_uuid, credential_uuid, AuthType.CREDENTIAL.value
+                    )
                     return auth_uuid
 
                 return resp
@@ -226,9 +225,7 @@ async def token(request: web.Request) -> web.Response:
     token_port = request.app["config"].token_service.port
     token_path = request.app["config"].token_service.path
 
-    credential_url = URL(
-        f"http://{token_host}:{token_port}{token_path}{request.path.replace('/auth/token', '')}"
-    )
+    credential_url = URL(f"http://{token_host}:{token_port}{token_path}{request.path.replace('/auth/token', '')}")
 
     headers = request.headers.copy()
     data = await request.read()
@@ -240,7 +237,7 @@ async def token(request: web.Request) -> web.Response:
             ) as response:
                 resp = await _clone_response(response)
 
-                if response.status == 200 and request.method == 'POST' and request.path == '/auth/token':
+                if response.status == 200 and request.method == "POST" and request.path == "/auth/token":
                     resp_json = json.loads(resp.text)
                     credential_uuid = resp_json["token"]
                     auth_uuid = await create_authentication(request, credential_uuid, AuthType.TOKEN.value)
@@ -258,15 +255,15 @@ async def _clone_response(response: ClientResponse) -> web.Response:
     )
 
 
-async def create_authentication(request: web.Request, token: str, user_id: str, user_uuid: str, auth_uuid: str, auth_type: AuthType):
+async def create_authentication(
+    request: web.Request, token: str, user_id: str, user_uuid: str, auth_uuid: str, auth_type: AuthType
+):
     Session = sessionmaker(bind=request.app["db_engine"])
 
     s = Session()
 
     now = datetime.now()
     uuid = uuid4()
-
-
 
     credential = Authentication(
         uuid=uuid,

@@ -9,18 +9,20 @@ from aiomisc.service.aiohttp import (
 from sqlalchemy import (
     create_engine,
 )
-from .database.models import (
-    Base,
-)
+
 from .config import (
     AuthConfig,
 )
+from .database.models import (
+    Base,
+)
 from .handler import (
-    register,
     credentials,
-    token,
-    login,
     get_user_by_token,
+    login,
+    register,
+    token,
+    validate_token,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,6 +48,7 @@ class AuthRestService(AIOHTTPService):
         app.router.add_route("GET", "/auth/user", get_user_by_token)
         app.router.add_route("*", "/auth/credentials/{name:.*}", credentials)
         app.router.add_route("*", "/auth/token{name:.*}", token)
+        app.router.add_route("*", "/auth/validate-token", validate_token)
 
         return app
 

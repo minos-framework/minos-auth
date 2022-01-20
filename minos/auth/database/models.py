@@ -1,10 +1,13 @@
 import uuid
+from enum import (
+    Enum,
+)
 
 from sqlalchemy import (
     TIMESTAMP,
     Column,
+    Numeric,
     String,
-    Numeric
 )
 from sqlalchemy.dialects.postgresql import (
     UUID,
@@ -12,7 +15,6 @@ from sqlalchemy.dialects.postgresql import (
 from sqlalchemy.ext.declarative import (
     declarative_base,
 )
-from enum import Enum
 
 Base = declarative_base()
 
@@ -37,6 +39,3 @@ class Authentication(Base):
         return "<Authentication(uuid='{}', auth_type='{}', auth_uuid={}, created_at={}, updated_at={})>".format(
             self.uuid, AuthType(self.auth_type), self.auth_uuid, self.created_at, self.updated_at
         )
-
-
-
