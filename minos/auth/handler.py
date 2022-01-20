@@ -109,9 +109,9 @@ async def validate_token(request: web.Request) -> web.Response:
 
 async def get_credential_token(request: web.Request, credential_uuid: str):
     """ Get User by Session token """
-    Session = sessionmaker(bind=request.app["db_engine"])
+    session = sessionmaker(bind=request.app["db_engine"])
 
-    s = Session()
+    s = session()
 
     r = s.query(Authentication).filter(Authentication.auth_uuid == credential_uuid).first()
     s.close()
@@ -129,9 +129,9 @@ async def get_user_by_token(request: web.Request) -> web.Response:
     except Exception:
         return web.HTTPBadRequest(text="Please provide Token.")
 
-    Session = sessionmaker(bind=request.app["db_engine"])
+    session = sessionmaker(bind=request.app["db_engine"])
 
-    s = Session()
+    s = session()
 
     r = s.query(Authentication).filter(Authentication.token == content["token"]).first()
     s.close()
@@ -258,9 +258,9 @@ async def _clone_response(response: ClientResponse) -> web.Response:
 async def create_authentication(
     request: web.Request, token: str, user_id: str, user_uuid: str, auth_uuid: str, auth_type: AuthType
 ):
-    Session = sessionmaker(bind=request.app["db_engine"])
+    session = sessionmaker(bind=request.app["db_engine"])
 
-    s = Session()
+    s = session()
 
     now = datetime.now()
     uuid = uuid4()
