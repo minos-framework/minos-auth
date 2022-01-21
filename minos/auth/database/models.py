@@ -6,6 +6,7 @@ from enum import (
 from sqlalchemy import (
     TIMESTAMP,
     Column,
+    Integer,
     Numeric,
     String,
 )
@@ -27,7 +28,7 @@ class AuthType(Enum):
 class Authentication(Base):
     __tablename__ = "authentication"
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    auth_type = Column(Numeric)
+    auth_type = Column(Integer)
     auth_uuid = Column(String)
     user_uuid = Column(String)
     user_id = Column(String)

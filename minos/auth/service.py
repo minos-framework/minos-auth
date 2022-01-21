@@ -17,11 +17,12 @@ from .database.models import (
     Base,
 )
 from .handler import (
+    create_token,
     credentials,
     get_user_by_token,
     login,
-    register,
-    create_token,
+    register_credentials,
+    register_token,
     validate_token,
 )
 
@@ -43,11 +44,12 @@ class AuthRestService(AIOHTTPService):
 
         app["db_engine"] = self.engine
 
-        app.router.add_route("*", "/auth/register", register)
+        app.router.add_route("POST", "/auth/token", register_token)
+        app.router.add_route("POST", "/auth/credentials", register_credentials)
         app.router.add_route("*", "/auth/login", login)
         app.router.add_route("GET", "/auth/user", get_user_by_token)
         app.router.add_route("*", "/auth/credentials/{name:.*}", credentials)
-        app.router.add_route("POST", "/auth/token", create_token)
+        # app.router.add_route("POST", "/auth/token", create_token)
         app.router.add_route("*", "/auth/validate-token", validate_token)
 
         return app
