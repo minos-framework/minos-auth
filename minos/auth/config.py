@@ -95,7 +95,7 @@ class AuthConfig(abc.ABC):
 
         if self._with_environment and key in _ENVIRONMENT_MAPPER and _ENVIRONMENT_MAPPER[key] in os.environ:
             if os.environ[_ENVIRONMENT_MAPPER[key]] in ["true", "True", "false", "False"]:
-                return bool(util.strtobool(os.environ[_ENVIRONMENT_MAPPER[key]]))
+                return bool(util.strtobool(os.environ[_ENVIRONMENT_MAPPER[key]]))  # pragma: no cover
             return os.environ[_ENVIRONMENT_MAPPER[key]]
 
         def _fn(k: str, data: dict[str, t.Any]) -> t.Any:

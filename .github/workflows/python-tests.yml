@@ -7,12 +7,25 @@ jobs:
         runs-on: ubuntu-latest
         container: python:3.9-buster
 
+        services:
+            postgres:
+                image: postgres
+                env:
+                    POSTGRES_USER: minos
+                    POSTGRES_PASSWORD: min0s
+                    POSTGRES_DB: auth_db
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+            AUTH_DATABASE_HOST: postgres
+
         steps:
             -   name: Check out repository code
                 uses: actions/checkout@v2
 
             -   name: Install Poetry
-                uses: snok/install-poetry@v1
+                uses: snok/install-poetry@v1.1.4
 
             -   name: Install dependencies
                 run: make install

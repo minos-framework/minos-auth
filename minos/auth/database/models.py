@@ -37,6 +37,6 @@ class Authentication(Base):
     updated_at = Column(TIMESTAMP)
 
     def __repr__(self):
-        return "<Authentication(uuid='{}', auth_type='{}', auth_uuid={}, created_at={}, updated_at={})>".format(
+        return "<Authentication(uuid='{}', auth_type='{}', auth_uuid={}, created_at={}, updated_at={})>".format(  # pragma: no cover
             self.uuid, AuthType(self.auth_type), self.auth_uuid, self.created_at, self.updated_at
         )

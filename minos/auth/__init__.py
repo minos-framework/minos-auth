@@ -11,3 +11,6 @@ from .exceptions import (
 from .launchers import (
     EntrypointLauncher,
 )
+from .service import (
+    AuthRestService,
+)
