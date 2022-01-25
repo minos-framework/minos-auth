@@ -47,7 +47,7 @@ async def register_credentials(request: web.Request) -> web.Response:
     if user_creation.status == 200:
         resp_json = json.loads(user_creation.text)
         user_uuid = resp_json["uuid"]
-        data = {"username": content["email"], "password": content["password"]}
+        data = {"username": content["username"], "password": content["password"]}
 
         credentials_response = await create_credentials_call(request, data)
 
@@ -56,7 +56,7 @@ async def register_credentials(request: web.Request) -> web.Response:
             credential_uuid = resp_json_cred["credential_uuid"]
             token = secrets.token_hex(20)
             await create_authentication(
-                request, token, content["email"], user_uuid, credential_uuid, AuthType.CREDENTIAL.value
+                request, token, content["username"], user_uuid, credential_uuid, AuthType.CREDENTIAL.value
             )
         else:
             return credentials_response
