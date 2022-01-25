@@ -2,9 +2,6 @@ import uuid
 from threading import (
     Thread,
 )
-from typing import (
-    Optional,
-)
 
 import requests
 from flask import (

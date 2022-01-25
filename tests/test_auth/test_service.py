@@ -33,7 +33,7 @@ class TestAuthRestService(AioHTTPTestCase):
             "/users", {"uuid": str(uuid4())}, methods=("POST",),
         )
         self.user.add_json_response(
-            f"/users/<uuid>", {"uuid": str(uuid4())}, methods=("GET",),
+            "/users/<uuid>", {"uuid": str(uuid4())}, methods=("GET",),
         )
 
         self.credentials = MockServer(
@@ -114,14 +114,14 @@ class TestAuthRestService(AioHTTPTestCase):
 
     async def test_create_token(self):
         url = "/auth/token"
-        response = await self.client.request("POST", url, data=json.dumps({"email": "test@gmail.com",}))
+        response = await self.client.request("POST", url, data=json.dumps({"email": "test@gmail.com", }))
 
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
     async def test_create_token_wrong_data(self):
         url = "/auth/token"
-        response = await self.client.request("POST", url, data=json.dumps({"example": "test",}))
+        response = await self.client.request("POST", url, data=json.dumps({"example": "test", }))
 
         self.assertEqual(400, response.status)
         self.assertDictEqual({"error": "Wrong data. Provide email."}, json.loads(await response.text()))
@@ -136,7 +136,7 @@ class TestAuthRestService(AioHTTPTestCase):
     async def test_get_user_from_token(self):
 
         url = "/auth/token"
-        response = await self.client.request("GET", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ",})
+        response = await self.client.request("GET", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ", })
 
         self.assertEqual(200, response.status)
         self.assertIn("uuid", await response.text())
@@ -152,7 +152,7 @@ class TestAuthRestService(AioHTTPTestCase):
     async def test_login_token(self):
 
         url = "/auth/token/login"
-        response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ",})
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ", })
 
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
@@ -160,7 +160,7 @@ class TestAuthRestService(AioHTTPTestCase):
     async def test_login_wrong_token(self):
 
         url = "/auth/token/login"
-        response = await self.client.request("POST", url, headers={"Authorization": "Bearer nonexistingtoken",})
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer nonexistingtoken", })
 
         self.assertEqual(400, response.status)
         self.assertDictEqual({"error": "Please provide correct Token."}, json.loads(await response.text()))
