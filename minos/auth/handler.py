@@ -71,9 +71,9 @@ async def register_token(request: web.Request) -> web.Response:
         content = await request.json()
 
         if "email" not in content:
-            return web.HTTPBadRequest(text="Wrong data. Provide email.")
+            return web.json_response({"error": "Wrong data. Provide email."}, status=400)
     except Exception:
-        return web.HTTPBadRequest(text="Wrong data. Provide email.")
+        return web.json_response({"error": "Wrong data. Provide email."}, status=400)
 
     user_creation = await create_user_service_call(request)
 
@@ -96,49 +96,6 @@ async def register_token(request: web.Request) -> web.Response:
         return token_response
 
     return user_creation
-
-
-async def create_user_service_call(request: web.Request) -> web.Response:
-    """ Register User """
-    user_host = request.app["config"].user_service.host
-    user_port = request.app["config"].user_service.port
-    user_path = request.app["config"].user_service.path
-
-    user_url = URL(f"http://{user_host}:{user_port}{user_path}")
-
-    headers = request.headers.copy()
-    data = await request.read()
-
-    try:
-        async with ClientSession() as session:
-            async with session.request(headers=headers, method="POST", url=user_url, data=data) as response:
-                return await _clone_response(response)
-
-    except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
-
-
-async def create_token_service_call(request: web.Request):
-    """ Register User """
-    token_host = request.app["config"].token_service.host
-    token_port = request.app["config"].token_service.port
-    token_path = request.app["config"].token_service.path
-
-    credential_url = URL(f"http://{token_host}:{token_port}{token_path}")
-
-    headers = request.headers.copy()
-    data = await request.read()
-
-    try:
-        async with ClientSession() as session:
-            async with session.request(
-                headers=headers, method=request.method, url=credential_url, data=data
-            ) as response:
-                resp = await _clone_response(response)
-
-                return resp
-    except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
 
 
 async def credentials_login(request: web.Request) -> web.Response:
@@ -167,6 +124,7 @@ async def token_login(request: web.Request) -> web.Response:
             r.token = res["token"]
             r.auth_uuid = res["uuid"]
             s.commit()
+            s.close()
             return web.json_response({"token": res["token"]})
 
     s.close()
@@ -176,34 +134,15 @@ async def token_login(request: web.Request) -> web.Response:
 
 async def validate_credentials(request: web.Request):
     """ Login User """
-    credential_host = request.app["config"].credential_service.host
-    credential_port = request.app["config"].credential_service.port
-    credential_path = request.app["config"].credential_service.path
+    response = await validate_credentials_call(request)
 
-    credential_url = URL(f"http://{credential_host}:{credential_port}{credential_path}/validate")
+    if response.status == 200:
+        resp_json = json.loads(response.text)
+        credential_uuid = resp_json["credential_uuid"]
+        token = await get_credential_token(request, credential_uuid)
+        return web.json_response({"token": token}), token
 
-    headers = request.headers.copy()
-    data = await request.read()
-
-    try:
-        async with ClientSession() as session:
-            async with session.request(headers=headers, method="POST", url=credential_url, data=data) as response:
-                resp = await _clone_response(response)
-
-                if response.status == 200:
-                    resp_json = json.loads(resp.text)
-                    credential_uuid = resp_json["credential_uuid"]
-                    token = await get_credential_token(request, credential_uuid)
-                    return web.json_response({"token": token}), token
-
-                return resp, None
-    except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
-
-
-async def validate_token(request: web.Request) -> web.Response:
-    """ Get User by Session token """
-    return await get_user_from_token(request, AuthType.TOKEN)
+    return response, None
 
 
 async def get_credential_token(request: web.Request, credential_uuid: str):
@@ -257,23 +196,6 @@ async def get_user_from_credentials(request: web.Request) -> web.Response:
     return resp
 
 
-async def token_service_call(request: web.Request, data: dict):
-    token_host = request.app["config"].token_service.host
-    token_port = request.app["config"].token_service.port
-    token_path = request.app["config"].token_service.path
-
-    token_url = URL(f"http://{token_host}:{token_port}{token_path}/validate")
-
-    try:
-        async with ClientSession() as session:
-            async with session.request(method="POST", url=token_url, data=json.dumps(data)) as response:
-                resp = await _clone_response(response)
-
-                return resp
-    except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
-
-
 async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:
     """ Get User by Session token """
     user_host = request.app["config"].user_service.host
@@ -285,13 +207,7 @@ async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:
     headers = request.headers.copy()
     data = await request.read()
 
-    try:
-        async with ClientSession() as session:
-            async with session.request(headers=headers, method="GET", url=credential_url, data=data) as response:
-                resp = await _clone_response(response)
-                return resp
-    except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
+    return await service_call(method="GET", url=credential_url, data=data, headers=headers)
 
 
 async def create_credentials_call(request: web.Request, data: dict, method: str = "POST") -> web.Response:
@@ -302,12 +218,60 @@ async def create_credentials_call(request: web.Request, data: dict, method: str 
 
     credential_url = URL(f"http://{credential_host}:{credential_port}{credential_path}")
 
+    return await service_call(method=method, url=credential_url, data=json.dumps(data))
+
+
+async def validate_credentials_call(request: web.Request):
+    """ Validate Credentials Call """
+    credential_host = request.app["config"].credential_service.host
+    credential_port = request.app["config"].credential_service.port
+    credential_path = request.app["config"].credential_service.path
+
+    credential_url = URL(f"http://{credential_host}:{credential_port}{credential_path}/validate")
+
+    headers = request.headers.copy()
+    data = await request.read()
+
+    return await service_call(method="POST", url=credential_url, data=data, headers=headers)
+
+
+async def create_token_service_call(request: web.Request):
+    """ Register User """
+    token_host = request.app["config"].token_service.host
+    token_port = request.app["config"].token_service.port
+    token_path = request.app["config"].token_service.path
+
+    credential_url = URL(f"http://{token_host}:{token_port}{token_path}")
+
+    headers = request.headers.copy()
+    data = await request.read()
+
+    return await service_call(method="POST", url=credential_url, data=data, headers=headers)
+
+
+async def create_user_service_call(request: web.Request) -> web.Response:
+    """ Register User """
+    user_host = request.app["config"].user_service.host
+    user_port = request.app["config"].user_service.port
+    user_path = request.app["config"].user_service.path
+
+    user_url = URL(f"http://{user_host}:{user_port}{user_path}")
+
+    headers = request.headers.copy()
+    data = await request.read()
+
+    return await service_call(method="POST", url=user_url, data=data, headers=headers)
+
+
+async def service_call(method: str, url: URL, data=None, headers=None):
     try:
         async with ClientSession() as session:
-            async with session.request(method=method, url=credential_url, data=json.dumps(data)) as response:
+            async with session.request(headers=headers, method=method, url=url, data=data) as response:
                 return await _clone_response(response)
     except ClientConnectorError:
-        raise web.HTTPServiceUnavailable(text="The requested endpoint is not available.")
+        return web.json_response(
+            {"error": "The requested endpoint is not available."}, status=web.HTTPServiceUnavailable.status_code
+        )
 
 
 # noinspection PyMethodMayBeStatic
@@ -347,8 +311,11 @@ async def create_authentication(
 
 
 async def _get_authorization_token(request: web.Request):
-    headers = request.headers
-    if "Authorization" in headers and "Bearer" in headers["Authorization"]:
-        parts = headers["Authorization"].split()
-        if len(parts) == 2:
-            return parts[1]
+    try:
+        headers = request.headers
+        if "Authorization" in headers and "Bearer" in headers["Authorization"]:
+            return headers["Authorization"].split()[1]
+        else:
+            raise Exception
+    except Exception as e:
+        raise e

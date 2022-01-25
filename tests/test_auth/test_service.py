@@ -82,6 +82,20 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertEqual(200, response.status)
         self.assertIn("uuid", await response.text())
 
+    async def test_create_credentials_wrong_data(self):
+        url = "/auth/credentials"
+        response = await self.client.request("POST", url, data=json.dumps({"example": "none"}))
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Wrong data. Provide username and password."}, json.loads(await response.text()))
+
+    async def test_create_credentials_no_data(self):
+        url = "/auth/credentials"
+        response = await self.client.request("POST", url,)
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Wrong data. Provide username and password."}, json.loads(await response.text()))
+
     async def test_get_user_from_credentials(self):
 
         url = "/auth/credentials"
@@ -109,6 +123,20 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
+    async def test_create_token_wrong_data(self):
+        url = "/auth/token"
+        response = await self.client.request("POST", url, data=json.dumps({"example": "test",}))
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Wrong data. Provide email."}, json.loads(await response.text()))
+
+    async def test_create_token_no_data(self):
+        url = "/auth/token"
+        response = await self.client.request("POST", url,)
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Wrong data. Provide email."}, json.loads(await response.text()))
+
     async def test_get_user_from_token(self):
 
         url = "/auth/token"
@@ -116,6 +144,14 @@ class TestAuthRestService(AioHTTPTestCase):
 
         self.assertEqual(200, response.status)
         self.assertIn("uuid", await response.text())
+
+    async def test_get_user_from_token_wrong(self):
+
+        url = "/auth/token"
+        response = await self.client.request("GET", url)
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Please provide Token."}, json.loads(await response.text()))
 
     async def test_login_token(self):
 
@@ -125,6 +161,54 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
+    async def test_login_wrong_token(self):
+
+        url = "/auth/token/login"
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer nonexistingtoken",})
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Please provide correct Token."}, json.loads(await response.text()))
+
+    async def test_login_without_token(self):
+
+        url = "/auth/token/login"
+        response = await self.client.request("POST", url)
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Please provide Token."}, json.loads(await response.text()))
+
+
+"""
+class TestAuth(AioHTTPTestCase):
+    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
+
+    def setUp(self) -> None:
+        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+
+        self.discovery = MockServer(host=self.config.discovery.host, port=self.config.discovery.port,)
+        self.discovery.add_callback_response("/microservices", lambda: abort(400), methods=("GET",))
+
+        self.discovery.start()
+        super().setUp()
+
+    def tearDown(self) -> None:
+        self.discovery.shutdown_server()
+        super().tearDown()
+
+    async def get_application(self):
+        rest_service = AuthRestService(
+            address=self.config.rest.host, port=self.config.rest.port, config=self.config
+        )
+
+        return await rest_service.create_application()
+
+    async def test_get(self):
+        url = "/order/5?verb=GET&path=12324"
+        response = await self.client.request("GET", url)
+
+        self.assertEqual(502, response.status)
+        self.assertIn("The Discovery Service response is wrong.", await response.text())
+"""
 
 if __name__ == "__main__":
     unittest.main()

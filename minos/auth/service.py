@@ -23,7 +23,6 @@ from .handler import (
     register_credentials,
     register_token,
     token_login,
-    validate_token,
 )
 
 logger = logging.getLogger(__name__)

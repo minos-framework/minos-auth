@@ -53,6 +53,7 @@ sphinxcontrib-apidoc = "^0.3.0"
 sphinx-rtd-theme = "^0.5.2"
 m2r2 = "^0.2.7"
 Flask = "^2.0.2"
+mistune = "0.8.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
