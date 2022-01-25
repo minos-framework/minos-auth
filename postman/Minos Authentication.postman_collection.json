@@ -1,0 +1,418 @@
+{
+	"info": {
+		"_postman_id": "7819196d-294e-491e-b203-25a75e2df52e",
+		"name": "Minos Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Credential",
+			"item": [
+				{
+					"name": "Create credentials",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"test_user_01\",\n    \"password\": \"HelloTestUser\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5568/credentials",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5568",
+							"path": [
+								"credentials"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate credentials",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "HelloTestUser",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "test_user_01",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5568/credentials/validate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5568",
+							"path": [
+								"credentials",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Token",
+			"item": [
+				{
+					"name": "Create token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5569/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5569",
+							"path": [
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"7eee01e3e06ac4645fd142e5480b677d8764dabed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5569/token/validate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5569",
+							"path": [
+								"token",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"c19e1ec8c9e040a3d5d51b7bbb83a4da1b1a7634\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5569/token/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5569",
+							"path": [
+								"token",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Register with Credentials",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test\",\n    \"surname\": \"User\",\n    \"email\": \"15@gmail.com\",\n    \"telephone\": \"3243242332\",\n    \"role\": 2,\n    \"username\": \"test_user2\",\n    \"password\": \"Test_User_1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:55909/auth/credentials",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"credentials"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Credentials LogIn",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "test_user2",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "Test_User_1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/credentials/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"credentials",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Credential Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b75490338e55d586b3489e1e6e648b5b0eeed02a",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/validate-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"validate-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Credentials",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "test_user2",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "Test_User_1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/credentials",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"credentials"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register with Token",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test\",\n    \"surname\": \"User\",\n    \"email\": \"15@gmail.com\",\n    \"telephone\": \"3243242332\",\n    \"role\": 2,\n    \"username\": \"test_user2\",\n    \"password\": \"Test_User_1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:55909/auth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token LogIn",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "8d9b6e96db067f48b49192c644a64e67ad63da0d",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/token/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"token",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d962722f0338d25df93510e19c1bde9eff18b873",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/validate-token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"validate-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d962722f0338d25df93510e19c1bde9eff18b873",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:55909/auth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "55909",
+					"path": [
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

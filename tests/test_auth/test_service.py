@@ -140,7 +140,7 @@ class TestAuthRestService(AioHTTPTestCase):
         response = await self.client.request("POST", url, headers={"Authorization": f"Bearer {token}"})
 
         self.assertEqual(200, response.status)
-        self.assertDictEqual({"message": "Token correct."}, json.loads(await response.text()))
+        self.assertIn("uuid", await response.text())
 
     async def test_create_token(self):
         url = "/auth/token"
@@ -192,7 +192,7 @@ class TestAuthRestService(AioHTTPTestCase):
         response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ"})
 
         self.assertEqual(200, response.status)
-        self.assertDictEqual({"message": "Token valid."}, json.loads(await response.text()))
+        self.assertIn("uuid", await response.text())
 
     async def test_login_wrong_token(self):
 

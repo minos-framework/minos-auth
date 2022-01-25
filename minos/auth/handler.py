@@ -211,10 +211,13 @@ async def validate_token(request: web.Request) -> web.Response:
 
     if r is not None:
         if r.auth_type == AuthType.TOKEN.value:
-            return await validate_token_call(request)
+            token_resp = await validate_token_call(request)
+
+            if token_resp.status == 200:
+                return await get_user_call(request, r.user_uuid)
 
         if r.auth_type == AuthType.CREDENTIAL.value:
-            return web.json_response({"message": "Token correct."})
+            return await get_user_call(request, r.user_uuid)
 
     return web.json_response({"error": "Please provide correct Token."}, status=400)
 
