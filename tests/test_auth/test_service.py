@@ -112,16 +112,46 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
+    async def test_validate_token_no_data(self):
+        url = "/auth/validate-token"
+        response = await self.client.request("POST", url)
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Please provide Token."}, json.loads(await response.text()))
+
+    async def test_validate_token_wrong_data(self):
+        url = "/auth/validate-token"
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer some-token"})
+
+        self.assertEqual(400, response.status)
+        self.assertDictEqual({"error": "Please provide correct Token."}, json.loads(await response.text()))
+
+    async def test_validate_credentials_token(self):
+        url = "/auth/credentials/login"
+        resp = await self.client.request(
+            "POST", url, data=json.dumps({"email": "test@gmail.com", "username": "test@gmail.com", "password": "1234"})
+        )
+
+        self.assertEqual(200, resp.status)
+        self.assertIn("token", await resp.text())
+
+        token = json.loads(await resp.text())["token"]
+        url = "/auth/validate-token"
+        response = await self.client.request("POST", url, headers={"Authorization": f"Bearer {token}"})
+
+        self.assertEqual(200, response.status)
+        self.assertDictEqual({"message": "Token correct."}, json.loads(await response.text()))
+
     async def test_create_token(self):
         url = "/auth/token"
-        response = await self.client.request("POST", url, data=json.dumps({"email": "test@gmail.com", }))
+        response = await self.client.request("POST", url, data=json.dumps({"email": "test@gmail.com"}))
 
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
     async def test_create_token_wrong_data(self):
         url = "/auth/token"
-        response = await self.client.request("POST", url, data=json.dumps({"example": "test", }))
+        response = await self.client.request("POST", url, data=json.dumps({"example": "test"}))
 
         self.assertEqual(400, response.status)
         self.assertDictEqual({"error": "Wrong data. Provide email."}, json.loads(await response.text()))
@@ -136,7 +166,7 @@ class TestAuthRestService(AioHTTPTestCase):
     async def test_get_user_from_token(self):
 
         url = "/auth/token"
-        response = await self.client.request("GET", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ", })
+        response = await self.client.request("GET", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ"})
 
         self.assertEqual(200, response.status)
         self.assertIn("uuid", await response.text())
@@ -152,15 +182,22 @@ class TestAuthRestService(AioHTTPTestCase):
     async def test_login_token(self):
 
         url = "/auth/token/login"
-        response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ", })
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ"})
 
         self.assertEqual(200, response.status)
         self.assertIn("token", await response.text())
 
+    async def test_validate_token(self):
+        url = "/auth/validate-token"
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer wenwmeodsaldkdñ"})
+
+        self.assertEqual(200, response.status)
+        self.assertDictEqual({"message": "Token valid."}, json.loads(await response.text()))
+
     async def test_login_wrong_token(self):
 
         url = "/auth/token/login"
-        response = await self.client.request("POST", url, headers={"Authorization": "Bearer nonexistingtoken", })
+        response = await self.client.request("POST", url, headers={"Authorization": "Bearer nonexistingtoken"})
 
         self.assertEqual(400, response.status)
         self.assertDictEqual({"error": "Please provide correct Token."}, json.loads(await response.text()))

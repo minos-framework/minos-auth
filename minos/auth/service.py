@@ -23,6 +23,7 @@ from .handler import (
     register_credentials,
     register_token,
     token_login,
+    validate_token,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,8 @@ class AuthRestService(AIOHTTPService):
         app.router.add_route("POST", "/auth/token", register_token)
         app.router.add_route("POST", "/auth/token/login", token_login)
         app.router.add_route("GET", "/auth/token", get_user_from_token)
+
+        app.router.add_route("POST", "/auth/validate-token", validate_token)
 
         return app
 

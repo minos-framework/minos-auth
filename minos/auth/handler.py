@@ -195,6 +195,30 @@ async def get_user_from_credentials(request: web.Request) -> web.Response:
     return resp
 
 
+async def validate_token(request: web.Request) -> web.Response:
+    """ Get User by Session token """
+    try:
+        token = await _get_authorization_token(request)
+    except Exception:
+        return web.json_response({"error": "Please provide Token."}, status=400)
+
+    session = sessionmaker(bind=request.app["db_engine"])
+
+    s = session()
+
+    r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    s.close()
+
+    if r is not None:
+        if r.auth_type == AuthType.TOKEN.value:
+            return await validate_token_call(request)
+
+        if r.auth_type == AuthType.CREDENTIAL.value:
+            return web.json_response({"message": "Token correct."})
+
+    return web.json_response({"error": "Please provide correct Token."}, status=400)
+
+
 async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:
     """ Get User by Session token """
     user_host = request.app["config"].user_service.host
@@ -232,6 +256,20 @@ async def validate_credentials_call(request: web.Request):
     data = await request.read()
 
     return await service_call(method="POST", url=credential_url, data=data, headers=headers)
+
+
+async def validate_token_call(request: web.Request):
+    """ Validate Credentials Call """
+    token_host = request.app["config"].token_service.host
+    token_port = request.app["config"].token_service.port
+    token_path = request.app["config"].token_service.path
+
+    token_url = URL(f"http://{token_host}:{token_port}{token_path}/validate")
+
+    headers = request.headers.copy()
+    data = await request.read()
+
+    return await service_call(method="POST", url=token_url, data=data, headers=headers)
 
 
 async def create_token_service_call(request: web.Request):
