@@ -8,10 +8,6 @@ from uuid import (
 import aiohttp
 from aiohttp.test_utils import (
     AioHTTPTestCase,
-    unittest_run_loop,
-)
-from werkzeug.exceptions import (
-    abort,
 )
 
 from minos.auth import (
@@ -177,38 +173,6 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertEqual(400, response.status)
         self.assertDictEqual({"error": "Please provide Token."}, json.loads(await response.text()))
 
-
-"""
-class TestAuth(AioHTTPTestCase):
-    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
-
-    def setUp(self) -> None:
-        self.config = AuthConfig(self.CONFIG_FILE_PATH)
-
-        self.discovery = MockServer(host=self.config.discovery.host, port=self.config.discovery.port,)
-        self.discovery.add_callback_response("/microservices", lambda: abort(400), methods=("GET",))
-
-        self.discovery.start()
-        super().setUp()
-
-    def tearDown(self) -> None:
-        self.discovery.shutdown_server()
-        super().tearDown()
-
-    async def get_application(self):
-        rest_service = AuthRestService(
-            address=self.config.rest.host, port=self.config.rest.port, config=self.config
-        )
-
-        return await rest_service.create_application()
-
-    async def test_get(self):
-        url = "/order/5?verb=GET&path=12324"
-        response = await self.client.request("GET", url)
-
-        self.assertEqual(502, response.status)
-        self.assertIn("The Discovery Service response is wrong.", await response.text())
-"""
 
 if __name__ == "__main__":
     unittest.main()

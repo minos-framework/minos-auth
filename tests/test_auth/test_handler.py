@@ -1,17 +1,8 @@
 """tests.test_api_gateway.test_rest.service module."""
 import json
 import unittest
-from uuid import (
-    uuid4,
-)
-
-import aiohttp
 from aiohttp.test_utils import (
     AioHTTPTestCase,
-    unittest_run_loop,
-)
-from werkzeug.exceptions import (
-    abort,
 )
 from yarl import (
     URL,
@@ -23,9 +14,6 @@ from minos.auth import (
 )
 from minos.auth.handler import (
     service_call,
-)
-from tests.mock_servers.server import (
-    MockServer,
 )
 from tests.utils import (
     BASE_PATH,

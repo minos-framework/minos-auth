@@ -7,7 +7,6 @@ from sqlalchemy import (
     TIMESTAMP,
     Column,
     Integer,
-    Numeric,
     String,
 )
 from sqlalchemy.dialects.postgresql import (

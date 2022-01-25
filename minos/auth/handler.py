@@ -16,7 +16,6 @@ from aiohttp import (
 )
 from sqlalchemy import (
     desc,
-    exc,
 )
 from sqlalchemy.orm import (
     sessionmaker,
