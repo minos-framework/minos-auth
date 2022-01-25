@@ -1,6 +1,7 @@
 """tests.test_api_gateway.test_rest.service module."""
 import json
 import unittest
+
 from aiohttp.test_utils import (
     AioHTTPTestCase,
 )
