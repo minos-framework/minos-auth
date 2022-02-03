@@ -1,0 +1,7 @@
+minos.auth.cli module
+=====================
+
+.. automodule:: minos.auth.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

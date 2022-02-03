@@ -1,0 +1,12 @@
+minos.auth.database namespace
+=============================
+
+.. py:module:: minos.auth.database
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   minos.auth.database.models

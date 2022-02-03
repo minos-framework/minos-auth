@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>minos.auth.handler &mdash; Minos Auth 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Minos Auth
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../runthetests.html">Run the tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/minos.html">minos namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Minos Auth</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>minos.auth.handler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for minos.auth.handler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">secrets</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">datetime</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">uuid4</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ClientConnectorError</span><span class="p">,</span>
+    <span class="n">ClientResponse</span><span class="p">,</span>
+    <span class="n">ClientSession</span><span class="p">,</span>
+    <span class="n">web</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">desc</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">sessionmaker</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yarl</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">URL</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.database.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Authentication</span><span class="p">,</span>
+    <span class="n">AuthType</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="register_credentials"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.register_credentials">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">register_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Register User &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;username&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;password&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Wrong data. Provide username and password.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Wrong data. Provide username and password.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">user_creation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_user_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user_creation</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">resp_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">user_creation</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">user_uuid</span> <span class="o">=</span> <span class="n">resp_json</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span> <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">]}</span>
+
+        <span class="n">credentials_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_credentials_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">credentials_response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">resp_json_cred</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">credentials_response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">credential_uuid</span> <span class="o">=</span> <span class="n">resp_json_cred</span><span class="p">[</span><span class="s2">&quot;credential_uuid&quot;</span><span class="p">]</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_hex</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">create_authentication</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span> <span class="n">user_uuid</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">,</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">credentials_response</span>
+
+    <span class="k">return</span> <span class="n">user_creation</span></div>
+
+
+<div class="viewcode-block" id="register_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.register_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">register_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Register User using token &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;email&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Wrong data. Provide email.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Wrong data. Provide email.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">user_creation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_user_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user_creation</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">resp_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">user_creation</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">user_uuid</span> <span class="o">=</span> <span class="n">resp_json</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span>
+
+        <span class="n">token_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_token_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">token_response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">resp_json_cred</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">token_response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">create_authentication</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="n">resp_json_cred</span><span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">],</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">],</span>
+                <span class="n">user_uuid</span><span class="p">,</span>
+                <span class="n">resp_json_cred</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">],</span>
+                <span class="n">AuthType</span><span class="o">.</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">token_response</span>
+
+    <span class="k">return</span> <span class="n">user_creation</span></div>
+
+
+<div class="viewcode-block" id="credentials_login"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.credentials_login">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">credentials_login</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Login User &quot;&quot;&quot;</span>
+    <span class="n">resp</span><span class="p">,</span> <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">validate_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resp</span></div>
+
+
+<div class="viewcode-block" id="token_login"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.token_login">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">token_login</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Login User &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_get_authorization_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">token_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">create_token_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">token_response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">]</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">auth_uuid</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">]})</span>
+
+    <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_credentials"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.validate_credentials">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Login User &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">validate_credentials_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">resp_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">credential_uuid</span> <span class="o">=</span> <span class="n">resp_json</span><span class="p">[</span><span class="s2">&quot;credential_uuid&quot;</span><span class="p">]</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_credential_token</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">}),</span> <span class="n">token</span>
+
+    <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_credential_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_credential_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_credential_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get User by Session token &quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">auth_uuid</span> <span class="o">==</span> <span class="n">credential_uuid</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">token</span></div>
+
+
+<div class="viewcode-block" id="get_user_from_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_user_from_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_user_from_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">auth_type</span><span class="p">:</span> <span class="n">AuthType</span> <span class="o">=</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">TOKEN</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get User by Session token &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_get_authorization_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">get_token_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">auth_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_token_user"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_token_user">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_token_user</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_type</span><span class="p">:</span> <span class="n">AuthType</span><span class="p">):</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">auth_type</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">user_call_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">user_call_response</span>
+
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPBadRequest</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_user_from_credentials"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_user_from_credentials">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_user_from_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="n">resp</span><span class="p">,</span> <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">validate_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">get_token_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resp</span></div>
+
+
+<div class="viewcode-block" id="validate_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.validate_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get User by Session token &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_get_authorization_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">token_resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">validate_token_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">token_resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_user_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_user_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">user_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get User by Session token &quot;&quot;&quot;</span>
+    <span class="n">user_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">user_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">user_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">credential_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">user_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">user_port</span><span class="si">}{</span><span class="n">user_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">user_uuid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">credential_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_credentials_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.create_credentials_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">create_credentials_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Orchestrate discovery and microservice call &quot;&quot;&quot;</span>
+    <span class="n">credential_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">credential_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">credential_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">credential_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">credential_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">credential_port</span><span class="si">}{</span><span class="n">credential_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">credential_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="validate_credentials_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.validate_credentials_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_credentials_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Validate Credentials Call &quot;&quot;&quot;</span>
+    <span class="n">credential_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">credential_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">credential_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">credential_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">credential_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">credential_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">credential_port</span><span class="si">}{</span><span class="n">credential_path</span><span class="si">}</span><span class="s2">/validate&quot;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">credential_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_token_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.validate_token_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_token_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Validate Credentials Call &quot;&quot;&quot;</span>
+    <span class="n">token_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">token_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">token_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">token_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">token_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">token_port</span><span class="si">}{</span><span class="n">token_path</span><span class="si">}</span><span class="s2">/validate&quot;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">token_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_token_service_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.create_token_service_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">create_token_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Register User &quot;&quot;&quot;</span>
+    <span class="n">token_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">token_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">token_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">token_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">credential_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">token_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">token_port</span><span class="si">}{</span><span class="n">token_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">credential_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_user_service_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.create_user_service_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">create_user_service_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Register User &quot;&quot;&quot;</span>
+    <span class="n">user_host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">host</span>
+    <span class="n">user_port</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">port</span>
+    <span class="n">user_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">user_service</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="n">user_url</span> <span class="o">=</span> <span class="n">URL</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">user_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">user_port</span><span class="si">}{</span><span class="n">user_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="k">await</span> <span class="n">service_call</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">user_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="service_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.service_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">service_call</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="n">URL</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">_clone_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ClientConnectorError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;The requested endpoint is not available.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="n">web</span><span class="o">.</span><span class="n">HTTPServiceUnavailable</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># noinspection PyMethodMayBeStatic</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_clone_response</span><span class="p">(</span><span class="n">response</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">(</span>
+        <span class="n">body</span><span class="o">=</span><span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">status</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_authentication"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.create_authentication">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">create_authentication</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_type</span><span class="p">:</span> <span class="n">AuthType</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Orchestrate discovery and microservice call &quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span>
+
+    <span class="n">credential</span> <span class="o">=</span> <span class="n">Authentication</span><span class="p">(</span>
+        <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
+        <span class="n">user_uuid</span><span class="o">=</span><span class="n">user_uuid</span><span class="p">,</span>
+        <span class="n">auth_uuid</span><span class="o">=</span><span class="n">auth_uuid</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+        <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
+        <span class="n">auth_type</span><span class="o">=</span><span class="n">auth_type</span><span class="p">,</span>
+        <span class="n">created_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+        <span class="n">updated_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">credential</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">uuid</span></div>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_get_authorization_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
+        <span class="k">if</span> <span class="s2">&quot;Authorization&quot;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span> <span class="s2">&quot;Bearer&quot;</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Clariteia.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

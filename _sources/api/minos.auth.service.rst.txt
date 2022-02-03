@@ -1,0 +1,7 @@
+minos.auth.service module
+=========================
+
+.. automodule:: minos.auth.service
+   :members:
+   :undoc-members:
+   :show-inheritance:

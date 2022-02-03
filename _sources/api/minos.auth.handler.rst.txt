@@ -1,0 +1,7 @@
+minos.auth.handler module
+=========================
+
+.. automodule:: minos.auth.handler
+   :members:
+   :undoc-members:
+   :show-inheritance:

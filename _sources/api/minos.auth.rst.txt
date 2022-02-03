@@ -1,0 +1,28 @@
+minos.auth package
+==================
+
+.. automodule:: minos.auth
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   minos.auth.database
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   minos.auth.cli
+   minos.auth.config
+   minos.auth.exceptions
+   minos.auth.handler
+   minos.auth.launchers
+   minos.auth.service

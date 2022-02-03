@@ -1,0 +1,7 @@
+minos.auth.exceptions module
+============================
+
+.. automodule:: minos.auth.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:

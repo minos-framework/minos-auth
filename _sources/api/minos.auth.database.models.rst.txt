@@ -1,0 +1,7 @@
+minos.auth.database.models module
+=================================
+
+.. automodule:: minos.auth.database.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
