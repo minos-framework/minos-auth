@@ -1,25 +1,15 @@
-from __future__ import (
-    annotations,
-)
+from __future__ import annotations
 
 import abc
 import collections
 import os
 import typing as t
-from distutils import (
-    util,
-)
-from pathlib import (
-    Path,
-)
-from typing import (
-    Any,
-)
+from distutils import util
+from pathlib import Path
+from typing import Any
 import yaml
 
-from .exceptions import (
-    AuthConfigException,
-)
+from .exceptions import AuthConfigException
 
 REST = collections.namedtuple("Rest", "host port")
 DATABASE = collections.namedtuple("Database", "dbname user password host port")
@@ -179,10 +169,7 @@ class AuthConfig(abc.ABC):
 
         :return: A ``REST`` NamedTuple instance.
         """
-        return ROLES(
-            roles=self._roles,
-            default=str(self._get("roles.default")),
-        )
+        return ROLES(roles=self._roles, default=str(self._get("roles.default")),)
 
     @property
     def _roles(self) -> list[ROLE]:
