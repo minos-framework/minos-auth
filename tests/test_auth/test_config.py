@@ -7,13 +7,17 @@ Minos framework can not be copied and/or distributed without the express permiss
 """
 import os
 import unittest
-from unittest import mock
+from unittest import (
+    mock,
+)
 
 from minos.auth import (
     AuthConfig,
     AuthConfigException,
 )
-from tests.utils import BASE_PATH
+from tests.utils import (
+    BASE_PATH,
+)
 
 
 class TestApiGatewayConfig(unittest.TestCase):
