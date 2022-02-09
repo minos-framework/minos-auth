@@ -62,6 +62,13 @@ class TestApiGatewayConfig(unittest.TestCase):
         self.assertEqual("min0s", database.password)
         self.assertEqual(5432, database.port)
 
+    def test_config_roles(self):
+        config = AuthConfig(path=self.config_file_path)
+        roles = config.roles
+
+        self.assertIsInstance(roles.roles, list)
+        self.assertEqual("Customer", roles.default)
+
     @mock.patch.dict(os.environ, {"AUTH_DATABASE_NAME": "db_test_name"})
     def test_overwrite_with_environment_database_name(self):
         config = AuthConfig(path=self.config_file_path)

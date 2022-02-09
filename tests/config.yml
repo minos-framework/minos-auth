@@ -21,3 +21,9 @@ token-service:
     port: 5569
     path: /token
     create-token: false
+roles:
+    roles:
+        - name: SuperAdmin
+        - name: Admin
+        - name: Customer
+    default: Customer
