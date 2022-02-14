@@ -211,5 +211,58 @@ class TestAuthRestService(AioHTTPTestCase):
         self.assertDictEqual({"error": "Please provide Token."}, json.loads(await response.text()))
 
 
+class TestRolesRestService(AioHTTPTestCase):
+    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
+
+    def setUp(self) -> None:
+        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+
+    async def get_application(self):
+        """
+        Override the get_app method to return your application.
+        """
+        rest_service = AuthRestService(address=self.config.rest.host, port=self.config.rest.port, config=self.config)
+
+        return await rest_service.create_application()
+
+    async def test_create_credentials(self):
+        url = "/auth/roles"
+        response = await self.client.request(
+            "GET", url,
+        )
+
+        self.assertEqual(200, response.status)
+
+
+class TestAuthenticationRestService(AioHTTPTestCase):
+    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
+
+    def setUp(self) -> None:
+        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+
+    async def get_application(self):
+        """
+        Override the get_app method to return your application.
+        """
+        rest_service = AuthRestService(address=self.config.rest.host, port=self.config.rest.port, config=self.config)
+
+        return await rest_service.create_application()
+
+    async def test_create_credentials(self):
+        url = "/auth/all"
+        response = await self.client.request(
+            "GET", url,
+        )
+
+        self.assertEqual(200, response.status)
+
 if __name__ == "__main__":
     unittest.main()

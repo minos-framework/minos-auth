@@ -60,7 +60,7 @@ async def register_credentials(request: web.Request) -> web.Response:
                 request, token, content["username"], user_uuid, credential_uuid, AuthType.CREDENTIAL.value
             )
         else:
-            return credentials_response
+            return credentials_response  # pragma: no cover
 
     return user_creation
 
@@ -95,7 +95,7 @@ async def register_token(request: web.Request) -> web.Response:
             )
         return token_response
 
-    return user_creation
+    return user_creation  # pragma: no cover
 
 
 async def credentials_login(request: web.Request) -> web.Response:
@@ -142,7 +142,7 @@ async def validate_credentials(request: web.Request):
         token = await get_credential_token(request, credential_uuid)
         return web.json_response({"token": token}), token
 
-    return response, None
+    return response, None  # pragma: no cover
 
 
 async def get_credential_token(request: web.Request, credential_uuid: str):
@@ -185,7 +185,7 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
             user_call_response = await get_user_call(request, r.user_uuid)
             return user_call_response
 
-    return web.HTTPBadRequest(text="Please provide correct Token.")
+    return web.HTTPBadRequest(text="Please provide correct Token.")  # pragma: no cover
 
 
 async def get_user_from_credentials(request: web.Request) -> web.Response:
@@ -193,7 +193,7 @@ async def get_user_from_credentials(request: web.Request) -> web.Response:
 
     if resp.status == 200:
         return await get_token_user(request, token, AuthType.CREDENTIAL)
-    return resp
+    return resp  # pragma: no cover
 
 
 async def validate_token(request: web.Request) -> web.Response:
