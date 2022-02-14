@@ -1,4 +1,7 @@
 import logging
+from datetime import (
+    datetime,
+)
 
 from aiohttp import (
     web,
@@ -9,12 +12,16 @@ from aiomisc.service.aiohttp import (
 from sqlalchemy import (
     create_engine,
 )
+from sqlalchemy.orm import (
+    sessionmaker,
+)
 
 from .config import (
     AuthConfig,
 )
 from .database.models import (
     Base,
+    Role,
 )
 from .handler import (
     credentials_login,
@@ -41,6 +48,7 @@ class AuthRestService(AIOHTTPService):
         app["config"] = self.config
         self.engine = await self.create_engine()
         await self.create_database()
+        await self.populate_database()
 
         app["db_engine"] = self.engine
 
@@ -66,3 +74,16 @@ class AuthRestService(AIOHTTPService):
 
     async def create_database(self):
         Base.metadata.create_all(self.engine)
+
+    async def populate_database(self):
+        session = sessionmaker(bind=self.engine)
+        s = session()
+        now = datetime.now()
+
+        for role in self.config.roles.roles:
+            instance = s.query(Role).filter(Role.code == role.code, Role.role_name == role.name).one_or_none()
+            if instance is None:  # pragma: no cover
+                r = Role(code=role.code, role_name=role.name, created_at=now, updated_at=now,)
+                s.add(r)
+        s.commit()
+        s.close()

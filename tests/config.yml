@@ -24,6 +24,9 @@ token-service:
 roles:
     roles:
         - name: SuperAdmin
+          code: 1
         - name: Admin
+          code: 2
         - name: Customer
-    default: Customer
+          code: 3
+    default: 3

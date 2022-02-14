@@ -15,6 +15,7 @@ from pathlib import (
 from typing import (
     Any,
 )
+
 import yaml
 
 from .exceptions import (
@@ -27,7 +28,7 @@ USER_SERVICE = collections.namedtuple("UserService", "host port path")
 CREDENTIAL_SERVICE = collections.namedtuple("CredentialService", "host port path create_token")
 TOKEN_SERVICE = collections.namedtuple("TokenService", "host port path create_token")
 ROLES = collections.namedtuple("Roles", "roles default")
-ROLE = collections.namedtuple("Role", "name")
+ROLE = collections.namedtuple("Role", "code name")
 
 _ENVIRONMENT_MAPPER = {
     "rest.host": "AUTH_REST_HOST",
@@ -179,10 +180,7 @@ class AuthConfig(abc.ABC):
 
         :return: A ``REST`` NamedTuple instance.
         """
-        return ROLES(
-            roles=self._roles,
-            default=str(self._get("roles.default")),
-        )
+        return ROLES(roles=self._roles, default=str(self._get("roles.default")),)
 
     @property
     def _roles(self) -> list[ROLE]:
@@ -191,4 +189,4 @@ class AuthConfig(abc.ABC):
         return roles
 
     def _role_entry(self, service: dict[str, Any]) -> ROLE:
-        return ROLE(name=service["name"],)
+        return ROLE(name=service["name"], code=service["code"],)

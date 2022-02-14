@@ -67,7 +67,7 @@ class TestApiGatewayConfig(unittest.TestCase):
         roles = config.roles
 
         self.assertIsInstance(roles.roles, list)
-        self.assertEqual("Customer", roles.default)
+        self.assertEqual("3", roles.default)
 
     @mock.patch.dict(os.environ, {"AUTH_DATABASE_NAME": "db_test_name"})
     def test_overwrite_with_environment_database_name(self):

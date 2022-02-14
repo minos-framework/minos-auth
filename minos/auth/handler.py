@@ -339,6 +339,7 @@ async def create_authentication(
         user_id=user_id,
         token=token,
         auth_type=auth_type,
+        role_code=int(request.app["config"].roles.default),
         created_at=now,
         updated_at=now,
     )
