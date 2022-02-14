@@ -31,6 +31,8 @@ from .handler import (
     register_token,
     token_login,
     validate_token,
+    RoleRest,
+    AuthenticationRest,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +63,10 @@ class AuthRestService(AIOHTTPService):
         app.router.add_route("GET", "/auth/token", get_user_from_token)
 
         app.router.add_route("POST", "/auth/validate-token", validate_token)
+
+        app.router.add_route("GET", "/auth/roles", RoleRest.get_roles)
+
+        app.router.add_route("GET", "/auth/all", AuthenticationRest.get_all)
 
         return app
 

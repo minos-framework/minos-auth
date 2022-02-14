@@ -74,6 +74,31 @@
 			]
 		},
 		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:55909/auth/all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "55909",
+							"path": [
+								"auth",
+								"all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Token",
 			"item": [
 				{
@@ -159,6 +184,31 @@
 			]
 		},
 		{
+			"name": "Roles",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:55909/auth/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "55909",
+							"path": [
+								"auth",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Register with Credentials",
 			"request": {
 				"auth": {
@@ -198,7 +248,7 @@
 					"basic": [
 						{
 							"key": "username",
-							"value": "test_user2",
+							"value": "test_user3",
 							"type": "string"
 						},
 						{

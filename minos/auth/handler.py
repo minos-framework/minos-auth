@@ -27,6 +27,7 @@ from yarl import (
 from .database.models import (
     Authentication,
     AuthType,
+    Role,
 )
 
 logger = logging.getLogger(__name__)
@@ -360,3 +361,31 @@ async def _get_authorization_token(request: web.Request):
             raise Exception
     except Exception as e:
         raise e
+
+
+class RoleRest:
+    @staticmethod
+    async def get_roles(request: web.Request):
+        session = sessionmaker(bind=request.app["db_engine"])
+
+        s = session()
+        records = s.query(Role).all()
+        res = list()
+        for record in records:
+            res.append(record.to_serializable_dict())
+        s.close()
+        return web.json_response(res)
+
+
+class AuthenticationRest:
+    @staticmethod
+    async def get_all(request: web.Request):
+        session = sessionmaker(bind=request.app["db_engine"])
+
+        s = session()
+        records = s.query(Authentication).all()
+        res = list()
+        for record in records:
+            res.append(record.to_serializable_dict())
+        s.close()
+        return web.json_response(res)

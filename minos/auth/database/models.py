@@ -16,6 +16,7 @@ from sqlalchemy.dialects.postgresql import (
 from sqlalchemy.ext.declarative import (
     declarative_base,
 )
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -34,6 +35,7 @@ class Authentication(Base):
     user_id = Column(String)
     token = Column(String)
     role_code = Column(Integer, ForeignKey("roles.code"))
+    role = relationship("Role", backref="parents")
     created_at = Column(TIMESTAMP)
     updated_at = Column(TIMESTAMP)
 
@@ -45,6 +47,20 @@ class Authentication(Base):
             )
         )
 
+    def to_serializable_dict(self):
+        return {
+            "uuid": str(self.uuid),
+            "auth_type": AuthType(self.auth_type).value,
+            "auth_name": AuthType(self.auth_type).name,
+            "auth_uuid": self.auth_uuid,
+            "user_uuid": self.user_uuid,
+            "user_id": self.user_id,
+            "token": self.token,
+            "role": self.role.to_serializable_dict(),
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
+        }
+
 
 class Role(Base):
     __tablename__ = "roles"
@@ -52,3 +68,11 @@ class Role(Base):
     role_name = Column(String)
     created_at = Column(TIMESTAMP)
     updated_at = Column(TIMESTAMP)
+
+    def to_serializable_dict(self):
+        return {
+            "code": self.code,
+            "role_name": self.role_name,
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
+        }
