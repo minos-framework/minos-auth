@@ -1,25 +1,17 @@
 """tests.test_api_gateway.test_rest.service module."""
 import json
 import unittest
-from uuid import (
-    uuid4,
-)
+from uuid import uuid4
 
 import aiohttp
-from aiohttp.test_utils import (
-    AioHTTPTestCase,
-)
+from aiohttp.test_utils import AioHTTPTestCase
 
 from minos.auth import (
     AuthConfig,
     AuthRestService,
 )
-from tests.mock_servers.server import (
-    MockServer,
-)
-from tests.utils import (
-    BASE_PATH,
-)
+from tests.mock_servers.server import MockServer
+from tests.utils import BASE_PATH
 
 
 class TestAuthRestService(AioHTTPTestCase):
@@ -231,9 +223,7 @@ class TestRolesRestService(AioHTTPTestCase):
 
     async def test_create_credentials(self):
         url = "/auth/roles"
-        response = await self.client.request(
-            "GET", url,
-        )
+        response = await self.client.request("GET", url,)
 
         self.assertEqual(200, response.status)
 
@@ -258,11 +248,10 @@ class TestAuthenticationRestService(AioHTTPTestCase):
 
     async def test_create_credentials(self):
         url = "/auth/all"
-        response = await self.client.request(
-            "GET", url,
-        )
+        response = await self.client.request("GET", url,)
 
         self.assertEqual(200, response.status)
+
 
 if __name__ == "__main__":
     unittest.main()
