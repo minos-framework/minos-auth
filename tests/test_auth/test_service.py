@@ -1,17 +1,25 @@
 """tests.test_api_gateway.test_rest.service module."""
 import json
 import unittest
-from uuid import uuid4
+from uuid import (
+    uuid4,
+)
 
 import aiohttp
-from aiohttp.test_utils import AioHTTPTestCase
+from aiohttp.test_utils import (
+    AioHTTPTestCase,
+)
 
 from minos.auth import (
     AuthConfig,
     AuthRestService,
 )
-from tests.mock_servers.server import MockServer
-from tests.utils import BASE_PATH
+from tests.mock_servers.server import (
+    MockServer,
+)
+from tests.utils import (
+    BASE_PATH,
+)
 
 
 class TestAuthRestService(AioHTTPTestCase):
