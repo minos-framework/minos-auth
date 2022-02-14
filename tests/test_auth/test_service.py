@@ -231,9 +231,7 @@ class TestRolesRestService(AioHTTPTestCase):
 
     async def test_create_credentials(self):
         url = "/auth/roles"
-        response = await self.client.request(
-            "GET", url,
-        )
+        response = await self.client.request("GET", url,)
 
         self.assertEqual(200, response.status)
 
@@ -258,11 +256,10 @@ class TestAuthenticationRestService(AioHTTPTestCase):
 
     async def test_create_credentials(self):
         url = "/auth/all"
-        response = await self.client.request(
-            "GET", url,
-        )
+        response = await self.client.request("GET", url,)
 
         self.assertEqual(200, response.status)
+
 
 if __name__ == "__main__":
     unittest.main()
