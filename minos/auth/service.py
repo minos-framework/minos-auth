@@ -24,6 +24,8 @@ from .database.models import (
     Role,
 )
 from .handler import (
+    AuthenticationRest,
+    RoleRest,
     credentials_login,
     get_user_from_credentials,
     get_user_from_token,
@@ -31,8 +33,6 @@ from .handler import (
     register_token,
     token_login,
     validate_token,
-    RoleRest,
-    AuthenticationRest,
 )
 
 logger = logging.getLogger(__name__)
