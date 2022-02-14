@@ -1,8 +1,12 @@
 import json
 import logging
 import secrets
-from datetime import datetime
-from uuid import uuid4
+from datetime import (
+    datetime,
+)
+from uuid import (
+    uuid4,
+)
 
 from aiohttp import (
     ClientConnectorError,
@@ -10,9 +14,15 @@ from aiohttp import (
     ClientSession,
     web,
 )
-from sqlalchemy import desc
-from sqlalchemy.orm import sessionmaker
-from yarl import URL
+from sqlalchemy import (
+    desc,
+)
+from sqlalchemy.orm import (
+    sessionmaker,
+)
+from yarl import (
+    URL,
+)
 
 from .database.models import (
     Authentication,

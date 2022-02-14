@@ -1,17 +1,31 @@
 import logging
-from datetime import datetime
+from datetime import (
+    datetime,
+)
 
-from aiohttp import web
-from aiomisc.service.aiohttp import AIOHTTPService
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from aiohttp import (
+    web,
+)
+from aiomisc.service.aiohttp import (
+    AIOHTTPService,
+)
+from sqlalchemy import (
+    create_engine,
+)
+from sqlalchemy.orm import (
+    sessionmaker,
+)
 
-from .config import AuthConfig
+from .config import (
+    AuthConfig,
+)
 from .database.models import (
     Base,
     Role,
 )
 from .handler import (
+    AuthenticationRest,
+    RoleRest,
     credentials_login,
     get_user_from_credentials,
     get_user_from_token,
@@ -19,8 +33,6 @@ from .handler import (
     register_token,
     token_login,
     validate_token,
-    RoleRest,
-    AuthenticationRest,
 )
 
 logger = logging.getLogger(__name__)
