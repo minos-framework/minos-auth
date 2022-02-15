@@ -178,12 +178,18 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
     s = session()
 
     r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    role = r.role.code
     s.close()
 
     if r is not None:
         if r.auth_type == auth_type.value:
-            user_call_response = await get_user_call(request, r.user_uuid)
-            return user_call_response
+            response = await get_user_call(request, r.user_uuid)
+
+            if response.status == 200:
+                resp_json = json.loads(response.text)
+                resp_json['role'] = role
+                return web.json_response(resp_json)
+            return response
 
     return web.HTTPBadRequest(text="Please provide correct Token.")  # pragma: no cover
 
@@ -208,17 +214,32 @@ async def validate_token(request: web.Request) -> web.Response:
     s = session()
 
     r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    if r is not None:
+        role = r.role.code
     s.close()
 
     if r is not None:
+
         if r.auth_type == AuthType.TOKEN.value:
             token_resp = await validate_token_call(request)
 
             if token_resp.status == 200:
-                return await get_user_call(request, r.user_uuid)
+                response = await get_user_call(request, r.user_uuid)
+
+                if response.status == 200:
+                    resp_json = json.loads(response.text)
+                    resp_json['role'] = role
+                    return web.json_response(resp_json)
+                return response
 
         if r.auth_type == AuthType.CREDENTIAL.value:
-            return await get_user_call(request, r.user_uuid)
+            response = await get_user_call(request, r.user_uuid)
+
+            if response.status == 200:
+                resp_json = json.loads(response.text)
+                resp_json['role'] = role
+                return web.json_response(resp_json)
+            return response
 
     return web.json_response({"error": "Please provide correct Token."}, status=400)
 
