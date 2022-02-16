@@ -27,6 +27,7 @@ from yarl import (
 from .database.models import (
     Authentication,
     AuthType,
+    Role,
 )
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ async def register_credentials(request: web.Request) -> web.Response:
                 request, token, content["username"], user_uuid, credential_uuid, AuthType.CREDENTIAL.value
             )
         else:
-            return credentials_response
+            return credentials_response  # pragma: no cover
 
     return user_creation
 
@@ -94,7 +95,7 @@ async def register_token(request: web.Request) -> web.Response:
             )
         return token_response
 
-    return user_creation
+    return user_creation  # pragma: no cover
 
 
 async def credentials_login(request: web.Request) -> web.Response:
@@ -141,7 +142,7 @@ async def validate_credentials(request: web.Request):
         token = await get_credential_token(request, credential_uuid)
         return web.json_response({"token": token}), token
 
-    return response, None
+    return response, None  # pragma: no cover
 
 
 async def get_credential_token(request: web.Request, credential_uuid: str):
@@ -177,14 +178,20 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
     s = session()
 
     r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    role = r.role.code
     s.close()
 
     if r is not None:
         if r.auth_type == auth_type.value:
-            user_call_response = await get_user_call(request, r.user_uuid)
-            return user_call_response
+            response = await get_user_call(request, r.user_uuid)
 
-    return web.HTTPBadRequest(text="Please provide correct Token.")
+            if response.status == 200:
+                resp_json = json.loads(response.text)
+                resp_json["role"] = role
+                return web.json_response(resp_json)
+            return response  # pragma: no cover
+
+    return web.HTTPBadRequest(text="Please provide correct Token.")  # pragma: no cover
 
 
 async def get_user_from_credentials(request: web.Request) -> web.Response:
@@ -192,7 +199,7 @@ async def get_user_from_credentials(request: web.Request) -> web.Response:
 
     if resp.status == 200:
         return await get_token_user(request, token, AuthType.CREDENTIAL)
-    return resp
+    return resp  # pragma: no cover
 
 
 async def validate_token(request: web.Request) -> web.Response:
@@ -207,19 +214,33 @@ async def validate_token(request: web.Request) -> web.Response:
     s = session()
 
     r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    role = None
+    if r is not None:
+        role = r.role.code
     s.close()
 
     if r is not None:
+
         if r.auth_type == AuthType.TOKEN.value:
             token_resp = await validate_token_call(request)
 
             if token_resp.status == 200:
-                return await get_user_call(request, r.user_uuid)
+                return await user_call(request, r.user_uuid, role)
 
         if r.auth_type == AuthType.CREDENTIAL.value:
-            return await get_user_call(request, r.user_uuid)
+            return await user_call(request, r.user_uuid, role)
 
     return web.json_response({"error": "Please provide correct Token."}, status=400)
+
+
+async def user_call(request: web.Request, user_uuid, role):
+    response = await get_user_call(request, user_uuid)
+
+    if response.status == 200:
+        resp_json = json.loads(response.text)
+        resp_json["role"] = role
+        return web.json_response(resp_json)
+    return response  # pragma: no cover
 
 
 async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:
@@ -339,6 +360,7 @@ async def create_authentication(
         user_id=user_id,
         token=token,
         auth_type=auth_type,
+        role_code=int(request.app["config"].roles.default),
         created_at=now,
         updated_at=now,
     )
@@ -359,3 +381,31 @@ async def _get_authorization_token(request: web.Request):
             raise Exception
     except Exception as e:
         raise e
+
+
+class RoleRest:
+    @staticmethod
+    async def get_roles(request: web.Request):
+        session = sessionmaker(bind=request.app["db_engine"])
+
+        s = session()
+        records = s.query(Role).all()
+        res = list()
+        for record in records:
+            res.append(record.to_serializable_dict())
+        s.close()
+        return web.json_response(res)
+
+
+class AuthenticationRest:
+    @staticmethod
+    async def get_all(request: web.Request):
+        session = sessionmaker(bind=request.app["db_engine"])
+
+        s = session()
+        records = s.query(Authentication).all()
+        res = list()
+        for record in records:
+            res.append(record.to_serializable_dict())
+        s.close()
+        return web.json_response(res)
