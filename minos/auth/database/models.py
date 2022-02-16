@@ -1,7 +1,5 @@
 import uuid
-from enum import (
-    Enum,
-)
+from enum import Enum
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -10,15 +8,9 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from sqlalchemy.dialects.postgresql import (
-    UUID,
-)
-from sqlalchemy.ext.declarative import (
-    declarative_base,
-)
-from sqlalchemy.orm import (
-    relationship,
-)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 

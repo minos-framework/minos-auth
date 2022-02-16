@@ -1,12 +1,8 @@
 import json
 import logging
 import secrets
-from datetime import (
-    datetime,
-)
-from uuid import (
-    uuid4,
-)
+from datetime import datetime
+from uuid import uuid4
 
 from aiohttp import (
     ClientConnectorError,
@@ -14,15 +10,9 @@ from aiohttp import (
     ClientSession,
     web,
 )
-from sqlalchemy import (
-    desc,
-)
-from sqlalchemy.orm import (
-    sessionmaker,
-)
-from yarl import (
-    URL,
-)
+from sqlalchemy import desc
+from sqlalchemy.orm import sessionmaker
+from yarl import URL
 
 from .database.models import (
     Authentication,
@@ -187,7 +177,7 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
 
             if response.status == 200:
                 resp_json = json.loads(response.text)
-                resp_json['role'] = role
+                resp_json["role"] = role
                 return web.json_response(resp_json)
             return response  # pragma: no cover
 
@@ -229,7 +219,7 @@ async def validate_token(request: web.Request) -> web.Response:
 
                 if response.status == 200:
                     resp_json = json.loads(response.text)
-                    resp_json['role'] = role
+                    resp_json["role"] = role
                     return web.json_response(resp_json)
                 return response  # pragma: no cover
 
@@ -238,7 +228,7 @@ async def validate_token(request: web.Request) -> web.Response:
 
             if response.status == 200:
                 resp_json = json.loads(response.text)
-                resp_json['role'] = role
+                resp_json["role"] = role
                 return web.json_response(resp_json)
             return response  # pragma: no cover
 
