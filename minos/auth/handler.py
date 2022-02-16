@@ -189,7 +189,7 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
                 resp_json = json.loads(response.text)
                 resp_json['role'] = role
                 return web.json_response(resp_json)
-            return response
+            return response  # pragma: no cover
 
     return web.HTTPBadRequest(text="Please provide correct Token.")  # pragma: no cover
 
@@ -214,6 +214,7 @@ async def validate_token(request: web.Request) -> web.Response:
     s = session()
 
     r = s.query(Authentication).filter(Authentication.token == token).order_by(desc(Authentication.updated_at)).first()
+    role = None
     if r is not None:
         role = r.role.code
     s.close()
@@ -230,7 +231,7 @@ async def validate_token(request: web.Request) -> web.Response:
                     resp_json = json.loads(response.text)
                     resp_json['role'] = role
                     return web.json_response(resp_json)
-                return response
+                return response  # pragma: no cover
 
         if r.auth_type == AuthType.CREDENTIAL.value:
             response = await get_user_call(request, r.user_uuid)
@@ -239,7 +240,7 @@ async def validate_token(request: web.Request) -> web.Response:
                 resp_json = json.loads(response.text)
                 resp_json['role'] = role
                 return web.json_response(resp_json)
-            return response
+            return response  # pragma: no cover
 
     return web.json_response({"error": "Please provide correct Token."}, status=400)
 
