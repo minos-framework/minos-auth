@@ -1,12 +1,24 @@
 import logging
-from datetime import datetime
+from datetime import (
+    datetime,
+)
 
-from aiohttp import web
-from aiomisc.service.aiohttp import AIOHTTPService
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from aiohttp import (
+    web,
+)
+from aiomisc.service.aiohttp import (
+    AIOHTTPService,
+)
+from sqlalchemy import (
+    create_engine,
+)
+from sqlalchemy.orm import (
+    sessionmaker,
+)
 
-from .config import AuthConfig
+from .config import (
+    AuthConfig,
+)
 from .database.models import (
     Base,
     Role,
