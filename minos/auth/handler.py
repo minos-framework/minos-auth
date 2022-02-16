@@ -187,7 +187,7 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
 
             if response.status == 200:
                 resp_json = json.loads(response.text)
-                resp_json['role'] = role
+                resp_json["role"] = role
                 return web.json_response(resp_json)
             return response  # pragma: no cover
 
@@ -225,24 +225,22 @@ async def validate_token(request: web.Request) -> web.Response:
             token_resp = await validate_token_call(request)
 
             if token_resp.status == 200:
-                response = await get_user_call(request, r.user_uuid)
-
-                if response.status == 200:
-                    resp_json = json.loads(response.text)
-                    resp_json['role'] = role
-                    return web.json_response(resp_json)
-                return response  # pragma: no cover
+                return await user_call(request, r.user_uuid, role)
 
         if r.auth_type == AuthType.CREDENTIAL.value:
-            response = await get_user_call(request, r.user_uuid)
-
-            if response.status == 200:
-                resp_json = json.loads(response.text)
-                resp_json['role'] = role
-                return web.json_response(resp_json)
-            return response  # pragma: no cover
+            return await user_call(request, r.user_uuid, role)
 
     return web.json_response({"error": "Please provide correct Token."}, status=400)
+
+
+async def user_call(request: web.Request, user_uuid, role):
+    response = await get_user_call(request, user_uuid)
+
+    if response.status == 200:
+        resp_json = json.loads(response.text)
+        resp_json["role"] = role
+        return web.json_response(resp_json)
+    return response  # pragma: no cover
 
 
 async def get_user_call(request: web.Request, user_uuid: str) -> web.Response:

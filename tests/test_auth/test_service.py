@@ -21,12 +21,12 @@ from tests.utils import (
     BASE_PATH,
 )
 
+CONFIG_FILE_PATH = BASE_PATH / "config.yml"
+
 
 class TestAuthRestService(AioHTTPTestCase):
-    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
-
     def setUp(self) -> None:
-        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+        self.config = AuthConfig(CONFIG_FILE_PATH)
 
         self.user = MockServer(host=self.config.user_service.host, port=self.config.user_service.port,)
         self.user.add_json_response(
@@ -212,10 +212,8 @@ class TestAuthRestService(AioHTTPTestCase):
 
 
 class TestRolesRestService(AioHTTPTestCase):
-    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
-
     def setUp(self) -> None:
-        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+        self.config = AuthConfig(CONFIG_FILE_PATH)
         super().setUp()
 
     def tearDown(self) -> None:
@@ -237,10 +235,8 @@ class TestRolesRestService(AioHTTPTestCase):
 
 
 class TestAuthenticationRestService(AioHTTPTestCase):
-    CONFIG_FILE_PATH = BASE_PATH / "config.yml"
-
     def setUp(self) -> None:
-        self.config = AuthConfig(self.CONFIG_FILE_PATH)
+        self.config = AuthConfig(CONFIG_FILE_PATH)
         super().setUp()
 
     def tearDown(self) -> None:
