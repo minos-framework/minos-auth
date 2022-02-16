@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "minos_auth"
-version = "0.1.0"
+version = "0.2.0"
 description = "Minos Boilerplate contains all the boilerplate you need to create a Minos Python package."
 readme = "README.md"
 repository = "https://github.com/clariteia/minos_auth"
