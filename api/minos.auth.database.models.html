@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.database.models module &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.database.models module &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -241,6 +241,21 @@ for example, any mapped columns or relationships.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Authentication.role">
+<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#minos.auth.database.models.Authentication.role" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Authentication.role_code">
+<span class="sig-name descname"><span class="pre">role_code</span></span><a class="headerlink" href="#minos.auth.database.models.Authentication.role_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="minos.auth.database.models.Authentication.to_serializable_dict">
+<span class="sig-name descname"><span class="pre">to_serializable_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/database/models.html#Authentication.to_serializable_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.database.models.Authentication.to_serializable_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="minos.auth.database.models.Authentication.token">
 <span class="sig-name descname"><span class="pre">token</span></span><a class="headerlink" href="#minos.auth.database.models.Authentication.token" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -263,6 +278,58 @@ for example, any mapped columns or relationships.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="minos.auth.database.models.Authentication.uuid">
 <span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" href="#minos.auth.database.models.Authentication.uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">minos.auth.database.models.</span></span><span class="sig-name descname"><span class="pre">Role</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/database/models.html#Role"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.database.models.Role" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Base</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#minos.auth.database.models.Role.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple constructor that allows initialization from kwargs.</p>
+<p>Sets attributes on the constructed instance using the names and
+values in <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>.</p>
+<p>Only keys that are present as
+attributes of the instance’s class are allowed. These could be,
+for example, any mapped columns or relationships.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.code">
+<span class="sig-name descname"><span class="pre">code</span></span><a class="headerlink" href="#minos.auth.database.models.Role.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#minos.auth.database.models.Role.created_at" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">MetaData()</span></em><a class="headerlink" href="#minos.auth.database.models.Role.metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.registry">
+<span class="sig-name descname"><span class="pre">registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.decl_api.registry</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#minos.auth.database.models.Role.registry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.role_name">
+<span class="sig-name descname"><span class="pre">role_name</span></span><a class="headerlink" href="#minos.auth.database.models.Role.role_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.to_serializable_dict">
+<span class="sig-name descname"><span class="pre">to_serializable_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/database/models.html#Role.to_serializable_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.database.models.Role.to_serializable_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="minos.auth.database.models.Role.updated_at">
+<span class="sig-name descname"><span class="pre">updated_at</span></span><a class="headerlink" href="#minos.auth.database.models.Role.updated_at" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

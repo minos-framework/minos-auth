@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.database.models &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.database.models &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -170,6 +170,7 @@
 <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TIMESTAMP</span><span class="p">,</span>
     <span class="n">Column</span><span class="p">,</span>
+    <span class="n">ForeignKey</span><span class="p">,</span>
     <span class="n">Integer</span><span class="p">,</span>
     <span class="n">String</span><span class="p">,</span>
 <span class="p">)</span>
@@ -178,6 +179,9 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">declarative_base</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">relationship</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
@@ -196,6 +200,8 @@
     <span class="n">user_uuid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
     <span class="n">user_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">role_code</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;roles.code&quot;</span><span class="p">))</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Role&quot;</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s2">&quot;parents&quot;</span><span class="p">)</span>
     <span class="n">created_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">)</span>
     <span class="n">updated_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">)</span>
 
@@ -205,7 +211,37 @@
             <span class="s2">&quot;auth_uuid=</span><span class="si">{}</span><span class="s2">, created_at=</span><span class="si">{}</span><span class="s2">, updated_at=</span><span class="si">{}</span><span class="s2">)&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">AuthType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_uuid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span>
             <span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Authentication.to_serializable_dict"><a class="viewcode-back" href="../../../../api/minos.auth.database.models.html#minos.auth.database.models.Authentication.to_serializable_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_serializable_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">),</span>
+            <span class="s2">&quot;auth_type&quot;</span><span class="p">:</span> <span class="n">AuthType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;auth_name&quot;</span><span class="p">:</span> <span class="n">AuthType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_type</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;auth_uuid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_uuid</span><span class="p">,</span>
+            <span class="s2">&quot;user_uuid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">to_serializable_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="p">),</span>
+            <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span><span class="p">),</span>
+        <span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="Role"><a class="viewcode-back" href="../../../../api/minos.auth.database.models.html#minos.auth.database.models.Role">[docs]</a><span class="k">class</span> <span class="nc">Role</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;roles&quot;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">role_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">)</span>
+    <span class="n">updated_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Role.to_serializable_dict"><a class="viewcode-back" href="../../../../api/minos.auth.database.models.html#minos.auth.database.models.Role.to_serializable_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_serializable_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="s2">&quot;role_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">role_name</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="p">),</span>
+            <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updated_at</span><span class="p">),</span>
+        <span class="p">}</span></div></div>
 </pre></div>
 
            </div>

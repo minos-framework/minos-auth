@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.handler &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.handler &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -191,6 +191,7 @@
 <span class="kn">from</span> <span class="nn">.database.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Authentication</span><span class="p">,</span>
     <span class="n">AuthType</span><span class="p">,</span>
+    <span class="n">Role</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -223,7 +224,7 @@
                 <span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span> <span class="n">user_uuid</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">,</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="o">.</span><span class="n">value</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">credentials_response</span>
+            <span class="k">return</span> <span class="n">credentials_response</span>  <span class="c1"># pragma: no cover</span>
 
     <span class="k">return</span> <span class="n">user_creation</span></div>
 
@@ -258,7 +259,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">token_response</span>
 
-    <span class="k">return</span> <span class="n">user_creation</span></div>
+    <span class="k">return</span> <span class="n">user_creation</span>  <span class="c1"># pragma: no cover</span></div>
 
 
 <div class="viewcode-block" id="credentials_login"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.credentials_login">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">credentials_login</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
@@ -305,7 +306,7 @@
         <span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_credential_token</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">}),</span> <span class="n">token</span>
 
-    <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># pragma: no cover</span></div>
 
 
 <div class="viewcode-block" id="get_credential_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_credential_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_credential_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">credential_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -341,14 +342,20 @@
     <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">code</span>
     <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">auth_type</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-            <span class="n">user_call_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">user_call_response</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPBadRequest</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">resp_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">resp_json</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">role</span>
+                <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">resp_json</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>  <span class="c1"># pragma: no cover</span>
+
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPBadRequest</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span></div>
 
 
 <div class="viewcode-block" id="get_user_from_credentials"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_user_from_credentials">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_user_from_credentials</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
@@ -356,7 +363,7 @@
 
     <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="n">get_token_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">resp</span></div>
+    <span class="k">return</span> <span class="n">resp</span>  <span class="c1"># pragma: no cover</span></div>
 
 
 <div class="viewcode-block" id="validate_token"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.validate_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">validate_token</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
@@ -371,19 +378,33 @@
     <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">token</span> <span class="o">==</span> <span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">Authentication</span><span class="o">.</span><span class="n">updated_at</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">role</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">code</span>
     <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="n">token_resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">validate_token_call</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">token_resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-                <span class="k">return</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">auth_type</span> <span class="o">==</span> <span class="n">AuthType</span><span class="o">.</span><span class="n">CREDENTIAL</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-            <span class="k">return</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">)</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">user_uuid</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide correct Token.&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="user_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.user_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">user_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">user_uuid</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_uuid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">resp_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">resp_json</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">role</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">resp_json</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>  <span class="c1"># pragma: no cover</span></div>
 
 
 <div class="viewcode-block" id="get_user_call"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.get_user_call">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_user_call</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="n">user_uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">web</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
@@ -503,6 +524,7 @@
         <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
         <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
         <span class="n">auth_type</span><span class="o">=</span><span class="n">auth_type</span><span class="p">,</span>
+        <span class="n">role_code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">default</span><span class="p">),</span>
         <span class="n">created_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
         <span class="n">updated_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
     <span class="p">)</span>
@@ -523,6 +545,34 @@
             <span class="k">raise</span> <span class="ne">Exception</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">e</span>
+
+
+<div class="viewcode-block" id="RoleRest"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.RoleRest">[docs]</a><span class="k">class</span> <span class="nc">RoleRest</span><span class="p">:</span>
+<div class="viewcode-block" id="RoleRest.get_roles"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.RoleRest.get_roles">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_roles</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">to_serializable_dict</span><span class="p">())</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AuthenticationRest"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.AuthenticationRest">[docs]</a><span class="k">class</span> <span class="nc">AuthenticationRest</span><span class="p">:</span>
+<div class="viewcode-block" id="AuthenticationRest.get_all"><a class="viewcode-back" href="../../../api/minos.auth.handler.html#minos.auth.handler.AuthenticationRest.get_all">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">])</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Authentication</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">to_serializable_dict</span><span class="p">())</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

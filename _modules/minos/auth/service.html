@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.service &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.service &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -163,6 +163,9 @@
             
   <h1>Source code for minos.auth.service</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">datetime</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">web</span><span class="p">,</span>
@@ -173,14 +176,20 @@
 <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">create_engine</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">sessionmaker</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AuthConfig</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.database.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Base</span><span class="p">,</span>
+    <span class="n">Role</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.handler</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthenticationRest</span><span class="p">,</span>
+    <span class="n">RoleRest</span><span class="p">,</span>
     <span class="n">credentials_login</span><span class="p">,</span>
     <span class="n">get_user_from_credentials</span><span class="p">,</span>
     <span class="n">get_user_from_token</span><span class="p">,</span>
@@ -205,6 +214,7 @@
         <span class="n">app</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_engine</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_database</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">populate_database</span><span class="p">()</span>
 
         <span class="n">app</span><span class="p">[</span><span class="s2">&quot;db_engine&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span>
 
@@ -218,6 +228,10 @@
 
         <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/auth/validate-token&quot;</span><span class="p">,</span> <span class="n">validate_token</span><span class="p">)</span>
 
+        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/auth/roles&quot;</span><span class="p">,</span> <span class="n">RoleRest</span><span class="o">.</span><span class="n">get_roles</span><span class="p">)</span>
+
+        <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/auth/all&quot;</span><span class="p">,</span> <span class="n">AuthenticationRest</span><span class="o">.</span><span class="n">get_all</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">app</span></div>
 
 <div class="viewcode-block" id="AuthRestService.create_engine"><a class="viewcode-back" href="../../../api/minos.auth.service.html#minos.auth.service.AuthRestService.create_engine">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -229,7 +243,20 @@
         <span class="k">return</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">DATABASE_URI</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AuthRestService.create_database"><a class="viewcode-back" href="../../../api/minos.auth.service.html#minos.auth.service.AuthRestService.create_database">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span></div></div>
+        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthRestService.populate_database"><a class="viewcode-back" href="../../../api/minos.auth.service.html#minos.auth.service.AuthRestService.populate_database">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">populate_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">session</span><span class="p">()</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">roles</span><span class="p">:</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Role</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Role</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">role</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">Role</span><span class="o">.</span><span class="n">role_name</span> <span class="o">==</span> <span class="n">role</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">one_or_none</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">Role</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">role</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">role_name</span><span class="o">=</span><span class="n">role</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">created_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span> <span class="n">updated_at</span><span class="o">=</span><span class="n">now</span><span class="p">,)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

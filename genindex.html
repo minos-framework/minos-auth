@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>Index &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -174,6 +174,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -189,6 +190,8 @@
 
       <ul>
         <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.__init__">(minos.auth.database.models.Authentication method)</a>
+</li>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.__init__">(minos.auth.database.models.Role method)</a>
 </li>
         <li><a href="api/minos.auth.exceptions.html#minos.auth.exceptions.ApiGatewayConfigException.__init__">(minos.auth.exceptions.ApiGatewayConfigException method)</a>
 </li>
@@ -219,15 +222,17 @@
       </ul></li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.auth_type">auth_type (minos.auth.database.models.Authentication attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.auth_uuid">auth_uuid (minos.auth.database.models.Authentication attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/minos.auth.config.html#minos.auth.config.AuthConfig">AuthConfig (class in minos.auth.config)</a>
 </li>
       <li><a href="api/minos.auth.exceptions.html#minos.auth.exceptions.AuthConfigException">AuthConfigException</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication">Authentication (class in minos.auth.database.models)</a>
+</li>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.AuthenticationRest">AuthenticationRest (class in minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.service.html#minos.auth.service.AuthRestService">AuthRestService (class in minos.auth.service)</a>
 </li>
@@ -239,6 +244,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.code">code (minos.auth.database.models.Role attribute)</a>
+</li>
       <li><a href="api/minos.auth.service.html#minos.auth.service.AuthRestService.context">context (minos.auth.service.AuthRestService property)</a>
 </li>
       <li><a href="api/minos.auth.service.html#minos.auth.service.AuthRestService.create_application">create_application() (minos.auth.service.AuthRestService method)</a>
@@ -260,7 +267,11 @@
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.create_user_service_call">create_user_service_call() (in module minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.created_at">created_at (minos.auth.database.models.Authentication attribute)</a>
+
+      <ul>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.created_at">(minos.auth.database.models.Role attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.AuthType.CREDENTIAL">CREDENTIAL (minos.auth.database.models.AuthType attribute)</a>
 </li>
       <li><a href="api/minos.auth.config.html#minos.auth.config.CREDENTIAL_SERVICE">CREDENTIAL_SERVICE (in module minos.auth.config)</a>
@@ -299,12 +310,16 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.AuthenticationRest.get_all">get_all() (minos.auth.handler.AuthenticationRest static method)</a>
+</li>
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.get_credential_token">get_credential_token() (in module minos.auth.handler)</a>
 </li>
-      <li><a href="api/minos.auth.handler.html#minos.auth.handler.get_token_user">get_token_user() (in module minos.auth.handler)</a>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.RoleRest.get_roles">get_roles() (minos.auth.handler.RoleRest static method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.get_token_user">get_token_user() (in module minos.auth.handler)</a>
+</li>
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.get_user_call">get_user_call() (in module minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.get_user_from_credentials">get_user_from_credentials() (in module minos.auth.handler)</a>
@@ -328,7 +343,11 @@
       <li><a href="api/minos.auth.cli.html#minos.auth.cli.main">main() (in module minos.auth.cli)</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.metadata">metadata (minos.auth.database.models.Authentication attribute)</a>
+
+      <ul>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.metadata">(minos.auth.database.models.Role attribute)</a>
 </li>
+      </ul></li>
       <li>
     minos
 
@@ -437,6 +456,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.service.html#minos.auth.service.AuthRestService.populate_database">populate_database() (minos.auth.service.AuthRestService method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -445,12 +472,32 @@
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.register_token">register_token() (in module minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.registry">registry (minos.auth.database.models.Authentication attribute)</a>
+
+      <ul>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.registry">(minos.auth.database.models.Role attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      </ul></li>
       <li><a href="api/minos.auth.config.html#minos.auth.config.REST">REST (in module minos.auth.config)</a>
 </li>
       <li><a href="api/minos.auth.config.html#minos.auth.config.AuthConfig.rest">rest (minos.auth.config.AuthConfig property)</a>
+</li>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role">Role (class in minos.auth.database.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.config.html#minos.auth.config.ROLE">ROLE (in module minos.auth.config)</a>
+</li>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.role">role (minos.auth.database.models.Authentication attribute)</a>
+</li>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.role_code">role_code (minos.auth.database.models.Authentication attribute)</a>
+</li>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.role_name">role_name (minos.auth.database.models.Role attribute)</a>
+</li>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.RoleRest">RoleRest (class in minos.auth.handler)</a>
+</li>
+      <li><a href="api/minos.auth.config.html#minos.auth.config.ROLES">ROLES (in module minos.auth.config)</a>
+</li>
+      <li><a href="api/minos.auth.config.html#minos.auth.config.AuthConfig.roles">roles (minos.auth.config.AuthConfig property)</a>
 </li>
       <li><a href="api/minos.auth.service.html#minos.auth.service.AuthRestService.runner">runner (minos.auth.service.AuthRestService attribute)</a>
 </li>
@@ -490,12 +537,18 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.token">token (minos.auth.database.models.Authentication attribute)</a>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.to_serializable_dict">to_serializable_dict() (minos.auth.database.models.Authentication method)</a>
+
+      <ul>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.to_serializable_dict">(minos.auth.database.models.Role method)</a>
 </li>
-      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.AuthType.TOKEN">TOKEN (minos.auth.database.models.AuthType attribute)</a>
+      </ul></li>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.token">token (minos.auth.database.models.Authentication attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.AuthType.TOKEN">TOKEN (minos.auth.database.models.AuthType attribute)</a>
+</li>
       <li><a href="api/minos.auth.handler.html#minos.auth.handler.token_login">token_login() (in module minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.config.html#minos.auth.config.TOKEN_SERVICE">TOKEN_SERVICE (in module minos.auth.config)</a>
@@ -509,13 +562,19 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.updated_at">updated_at (minos.auth.database.models.Authentication attribute)</a>
+
+      <ul>
+        <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Role.updated_at">(minos.auth.database.models.Role attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/minos.auth.handler.html#minos.auth.handler.user_call">user_call() (in module minos.auth.handler)</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.user_id">user_id (minos.auth.database.models.Authentication attribute)</a>
 </li>
-      <li><a href="api/minos.auth.config.html#minos.auth.config.USER_SERVICE">USER_SERVICE (in module minos.auth.config)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/minos.auth.config.html#minos.auth.config.USER_SERVICE">USER_SERVICE (in module minos.auth.config)</a>
+</li>
       <li><a href="api/minos.auth.config.html#minos.auth.config.AuthConfig.user_service">user_service (minos.auth.config.AuthConfig property)</a>
 </li>
       <li><a href="api/minos.auth.database.models.html#minos.auth.database.models.Authentication.user_uuid">user_uuid (minos.auth.database.models.Authentication attribute)</a>

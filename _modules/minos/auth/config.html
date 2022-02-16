@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.config &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.config &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -176,6 +176,9 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Path</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 
@@ -188,6 +191,8 @@
 <span class="n">USER_SERVICE</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;UserService&quot;</span><span class="p">,</span> <span class="s2">&quot;host port path&quot;</span><span class="p">)</span>
 <span class="n">CREDENTIAL_SERVICE</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;CredentialService&quot;</span><span class="p">,</span> <span class="s2">&quot;host port path create_token&quot;</span><span class="p">)</span>
 <span class="n">TOKEN_SERVICE</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;TokenService&quot;</span><span class="p">,</span> <span class="s2">&quot;host port path create_token&quot;</span><span class="p">)</span>
+<span class="n">ROLES</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Roles&quot;</span><span class="p">,</span> <span class="s2">&quot;roles default&quot;</span><span class="p">)</span>
+<span class="n">ROLE</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Role&quot;</span><span class="p">,</span> <span class="s2">&quot;code name&quot;</span><span class="p">)</span>
 
 <span class="n">_ENVIRONMENT_MAPPER</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;rest.host&quot;</span><span class="p">:</span> <span class="s2">&quot;AUTH_REST_HOST&quot;</span><span class="p">,</span>
@@ -331,7 +336,24 @@
             <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;token-service.port&quot;</span><span class="p">)),</span>
             <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;token-service.path&quot;</span><span class="p">)),</span>
             <span class="n">create_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;token-service.create-token&quot;</span><span class="p">),</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">roles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ROLES</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the rest config.</span>
+
+<span class="sd">        :return: A ``REST`` NamedTuple instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ROLES</span><span class="p">(</span><span class="n">roles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_roles</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;roles.default&quot;</span><span class="p">)),)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_roles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ROLE</span><span class="p">]:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s2">&quot;roles.roles&quot;</span><span class="p">)</span>
+        <span class="n">roles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_role_entry</span><span class="p">(</span><span class="n">role</span><span class="p">)</span> <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">info</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">roles</span>
+
+    <span class="k">def</span> <span class="nf">_role_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ROLE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ROLE</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">service</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">code</span><span class="o">=</span><span class="n">service</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">],)</span></div>
 </pre></div>
 
            </div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>minos.auth.handler module &mdash; Minos Auth 0.1.0 documentation</title>
+  <title>minos.auth.handler module &mdash; Minos Auth 0.2.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
             
           
@@ -181,6 +181,28 @@
             
   <div class="section" id="module-minos.auth.handler">
 <span id="minos-auth-handler-module"></span><h1>minos.auth.handler module<a class="headerlink" href="#module-minos.auth.handler" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="minos.auth.handler.AuthenticationRest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">minos.auth.handler.</span></span><span class="sig-name descname"><span class="pre">AuthenticationRest</span></span><a class="reference internal" href="../_modules/minos/auth/handler.html#AuthenticationRest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.AuthenticationRest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="minos.auth.handler.AuthenticationRest.get_all">
+<em class="property"><span class="pre">async</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/handler.html#AuthenticationRest.get_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.AuthenticationRest.get_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="minos.auth.handler.RoleRest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">minos.auth.handler.</span></span><span class="sig-name descname"><span class="pre">RoleRest</span></span><a class="reference internal" href="../_modules/minos/auth/handler.html#RoleRest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.RoleRest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="minos.auth.handler.RoleRest.get_roles">
+<em class="property"><span class="pre">async</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_roles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/handler.html#RoleRest.get_roles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.RoleRest.get_roles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="minos.auth.handler.create_authentication">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">minos.auth.handler.</span></span><span class="sig-name descname"><span class="pre">create_authentication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/handler.html#create_authentication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.create_authentication" title="Permalink to this definition">¶</a></dt>
@@ -306,6 +328,11 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="minos.auth.handler.user_call">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">minos.auth.handler.</span></span><span class="sig-name descname"><span class="pre">user_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/minos/auth/handler.html#user_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#minos.auth.handler.user_call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="minos.auth.handler.validate_credentials">
