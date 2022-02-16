@@ -187,7 +187,7 @@ async def get_token_user(request: web.Request, token: str, auth_type: AuthType):
 
             if response.status == 200:
                 resp_json = json.loads(response.text)
-                resp_json['role'] = role
+                resp_json["role"] = role
                 return web.json_response(resp_json)
             return response  # pragma: no cover
 
@@ -229,7 +229,7 @@ async def validate_token(request: web.Request) -> web.Response:
 
                 if response.status == 200:
                     resp_json = json.loads(response.text)
-                    resp_json['role'] = role
+                    resp_json["role"] = role
                     return web.json_response(resp_json)
                 return response  # pragma: no cover
 
@@ -238,7 +238,7 @@ async def validate_token(request: web.Request) -> web.Response:
 
             if response.status == 200:
                 resp_json = json.loads(response.text)
-                resp_json['role'] = role
+                resp_json["role"] = role
                 return web.json_response(resp_json)
             return response  # pragma: no cover
 
